@@ -1,5 +1,25 @@
 # @rsdoctor/core
 
+## 0.1.5
+
+### Patch Changes
+
+- 8d82c10: fix(core): optimize the package's dependencies
+  - @rsdoctor/graph@0.1.5
+  - @rsdoctor/sdk@0.1.5
+  - @rsdoctor/utils@0.1.5
+
+## 0.1.4
+
+### Patch Changes
+
+- 08c5a5e: fix(rspack): rspack loader analysis error
+- Updated dependencies [ddaee4b]
+  - @rsdoctor/utils@0.1.4
+  - @rsdoctor/graph@0.1.4
+  - @rsdoctor/sdk@0.1.4
+  - @rsdoctor/types@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes

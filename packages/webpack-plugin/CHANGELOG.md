@@ -1,5 +1,28 @@
 # @rsdoctor/webpack-plugin
 
+## 0.1.5
+
+### Patch Changes
+
+- 8d82c10: fix(core): optimize the package's dependencies
+- Updated dependencies [8d82c10]
+  - @rsdoctor/core@0.1.5
+  - @rsdoctor/graph@0.1.5
+  - @rsdoctor/sdk@0.1.5
+  - @rsdoctor/utils@0.1.5
+
+## 0.1.4
+
+### Patch Changes
+
+- ddaee4b: feat: vue repo disable loader analysis
+- Updated dependencies [ddaee4b]
+- Updated dependencies [08c5a5e]
+  - @rsdoctor/utils@0.1.4
+  - @rsdoctor/core@0.1.4
+  - @rsdoctor/graph@0.1.4
+  - @rsdoctor/sdk@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes
