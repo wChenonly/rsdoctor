@@ -24,14 +24,18 @@ export class RsdoctorServer implements SDK.RsdoctorServerInstance {
 
   private _router: Router;
 
+  private _innerClientPath: string;
+
   constructor(
     protected sdk: SDK.RsdoctorBuilderSDKInstance,
     port = Server.defaultPort,
+    innerClientPath = '',
   ) {
     assert(typeof port === 'number');
     // maybe the port will be rewrite in bootstrap()
     this.port = port;
     this._router = new Router({ sdk, server: this, apis: Object.values(APIs) });
+    this._innerClientPath = innerClientPath;
   }
 
   public get app(): SDK.RsdoctorServerInstance['app'] {
@@ -49,6 +53,10 @@ export class RsdoctorServer implements SDK.RsdoctorServerInstance {
 
   public get socketUrl(): string {
     return `ws://localhost:${this.port}`;
+  }
+
+  public get innerClientPath(): string {
+    return this._innerClientPath;
   }
 
   async bootstrap() {
