@@ -1,5 +1,37 @@
 # @rsdoctor/rspack-plugin
 
+## 0.1.8
+
+### Patch Changes
+
+- 157549c: fix(rspack-plugin): rspack plugin dependencies error
+  - @rsdoctor/core@0.1.8
+  - @rsdoctor/graph@0.1.8
+  - @rsdoctor/sdk@0.1.8
+  - @rsdoctor/utils@0.1.8
+
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [597d223]
+  - @rsdoctor/sdk@0.1.7
+  - @rsdoctor/core@0.1.7
+  - @rsdoctor/graph@0.1.7
+
+## 0.1.6
+
+### Patch Changes
+
+- 5986abf: feat(inner-rsdoctor): add innerClientName for inner-rsdoctor
+- Updated dependencies [60b805f]
+- Updated dependencies [8527171]
+- Updated dependencies [5986abf]
+- Updated dependencies [e322824]
+  - @rsdoctor/sdk@0.1.6
+  - @rsdoctor/core@0.1.6
+  - @rsdoctor/graph@0.1.6
+
 ## 0.1.5
 
 ### Patch Changes

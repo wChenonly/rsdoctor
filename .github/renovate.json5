@@ -1,11 +1,13 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": ["config:recommended"],
+	"extends": ["config:recommended", "schedule:weekly"],
 	"packageRules": [
 		// Use chore as semantic commit type for commit messages
 		{
 			"matchPackagePatterns": ["*"],
-			"semanticCommitType": "chore"
+			"semanticCommitType": "chore",
+			// always bump package.json
+			"rangeStrategy": "bump"
 		},
 		{
 			"groupName": "rspack",
@@ -43,6 +45,9 @@
 		// manually updating
 		"typescript",
 		// align Node.js version minimum requirements
-		"@types/node"
+		"@types/node",
+		"acorn",
+		"enhanced-resolve",
+		"@biomejs/biome"
 	]
 }

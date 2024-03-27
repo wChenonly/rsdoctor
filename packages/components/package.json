@@ -1,6 +1,6 @@
 {
   "name": "@rsdoctor/components",
-  "version": "0.1.5",
+  "version": "0.1.8",
   "main": "./dist/index.js",
   "license": "MIT",
   "module": "dist/index.js",
@@ -51,7 +51,7 @@
   ],
   "devDependencies": {
     "@ant-design/icons": "4.8.0",
-    "@monaco-editor/react": "4.4.6",
+    "@monaco-editor/react": "4.6.0",
     "@rsdoctor/graph": "workspace:*",
     "@rsdoctor/types": "workspace:*",
     "@rsdoctor/utils": "workspace:*",
@@ -60,7 +60,7 @@
     "@types/react": "^18",
     "@types/url-parse": "1.4.8",
     "ansi-to-react": "6.1.6",
-    "antd": "5.8.3",
+    "antd": "5.15.3",
     "axios": "^1.6.1",
     "dayjs": "1.11.6",
     "echarts": "^5.4.3",

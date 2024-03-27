@@ -1,6 +1,6 @@
 {
   "name": "@rsdoctor/client",
-  "version": "0.1.5",
+  "version": "0.1.8",
   "main": "dist/index.html",
   "repository": {
     "type": "git",
@@ -27,10 +27,10 @@
     "dist/"
   ],
   "devDependencies": {
-    "@rsbuild/core": "0.1.9",
-    "@rsbuild/plugin-node-polyfill": "0.1.9",
-    "@rsbuild/plugin-react": "0.1.9",
-    "@rsbuild/plugin-type-check": "0.1.9",
+    "@rsbuild/core": "0.5.3",
+    "@rsbuild/plugin-node-polyfill": "0.5.3",
+    "@rsbuild/plugin-react": "0.5.3",
+    "@rsbuild/plugin-type-check": "0.5.3",
     "@rsdoctor/components": "workspace:*",
     "@rsdoctor/types": "workspace:*",
     "@types/node": "^16",
@@ -38,7 +38,7 @@
     "@types/react-dom": "^18",
     "@types/serve-static": "1.15.0",
     "@types/webpack": "5.28.0",
-    "antd": "5.8.3",
+    "antd": "5.15.3",
     "normalize.css": "8.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",

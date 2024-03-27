@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { formatSize } from '../../utils';
 import { Color } from '../../constants';
 import { StatisticCard } from './statistic';
-
+export { StatisticCard } from './statistic';
 export interface DiffCardProps extends Pick<DiffCardContentProps, 'formatter'> {
   titles: Array<string> | [string | React.ReactNode];
   datas: Array<DiffCardContentProps['data']>;
@@ -14,7 +14,10 @@ export interface DiffCardProps extends Pick<DiffCardContentProps, 'formatter'> {
 
 export interface DiffCardContentProps {
   data: Client.RsdoctorClientAssetsDiffItem;
-  formatter?(v: number, target: 'baseline' | 'current'): number | string | React.ReactNode;
+  formatter?(
+    v: number,
+    target: 'baseline' | 'current',
+  ): number | string | React.ReactNode;
 }
 
 export interface PercentProps {
@@ -33,7 +36,11 @@ export const SizePercent: React.FC<
   return <Percent {...rest} {...diff} />;
 };
 
-export const Percent: React.FC<PercentProps> = ({ percent, state, fontSize = 14 }) => {
+export const Percent: React.FC<PercentProps> = ({
+  percent,
+  state,
+  fontSize = 14,
+}) => {
   const _percent = +percent.toFixed(2);
 
   if (_percent > 0) {
@@ -59,11 +66,16 @@ export const Percent: React.FC<PercentProps> = ({ percent, state, fontSize = 14 
   return null;
 };
 
-export const DiffCardContent: React.FC<DiffCardContentProps> = ({ data, formatter }) => {
+export const DiffCardContent: React.FC<DiffCardContentProps> = ({
+  data,
+  formatter,
+}) => {
   const { percent, state, size } = data;
   const { baseline, current } = size;
 
-  const bSize = formatter ? formatter(baseline, 'baseline') : formatSize(baseline);
+  const bSize = formatter
+    ? formatter(baseline, 'baseline')
+    : formatSize(baseline);
   const cSize = formatter ? formatter(current, 'current') : formatSize(current);
 
   return (
@@ -74,7 +86,11 @@ export const DiffCardContent: React.FC<DiffCardContentProps> = ({ data, formatte
             Current
           </Typography.Text>
           <Tooltip
-            title={typeof cSize === 'number' || typeof cSize === 'string' ? `Value of Current is ${cSize}` : undefined}
+            title={
+              typeof cSize === 'number' || typeof cSize === 'string'
+                ? `Value of Current is ${cSize}`
+                : undefined
+            }
           >
             <Typography.Text style={{ fontSize: 16, color: 'inherit' }} strong>
               {cSize}
@@ -87,7 +103,11 @@ export const DiffCardContent: React.FC<DiffCardContentProps> = ({ data, formatte
             Baseline
           </Typography.Text>
           <Tooltip
-            title={typeof bSize === 'number' || typeof bSize === 'string' ? `Value of Baseline is ${bSize}` : undefined}
+            title={
+              typeof bSize === 'number' || typeof bSize === 'string'
+                ? `Value of Baseline is ${bSize}`
+                : undefined
+            }
           >
             <Typography.Text style={{ fontSize: 14 }} type="secondary">
               {bSize}
@@ -99,7 +119,12 @@ export const DiffCardContent: React.FC<DiffCardContentProps> = ({ data, formatte
   );
 };
 
-export const DiffCard: React.FC<DiffCardProps> = ({ titles, datas, formatter, showPercentInTitle }) => {
+export const DiffCard: React.FC<DiffCardProps> = ({
+  titles,
+  datas,
+  formatter,
+  showPercentInTitle,
+}) => {
   const [idx, setIdx] = useState(0);
 
   return (
