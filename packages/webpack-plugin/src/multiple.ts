@@ -1,6 +1,6 @@
 import { RsdoctorSDKController } from '@rsdoctor/sdk';
 import type { Linter } from '@rsdoctor/types';
-import type { RsdoctorWebpackMultiplePluginOptions } from '@rsdoctor/core';
+import type { RsdoctorMultiplePluginOptions } from '@rsdoctor/core';
 
 import { RsdoctorWebpackPlugin } from './plugin';
 
@@ -12,7 +12,7 @@ export class RsdoctorWebpackMultiplePlugin<
   // @ts-expect-error
   private controller: RsdoctorSDKController;
 
-  constructor(options: RsdoctorWebpackMultiplePluginOptions<Rules> = {}) {
+  constructor(options: RsdoctorMultiplePluginOptions<Rules> = {}) {
     const controller = (() => {
       if (globalController) {
         return globalController;

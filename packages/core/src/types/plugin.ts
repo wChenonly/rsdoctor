@@ -7,9 +7,8 @@ import type {
 import type { RsdoctorSlaveSDK, RsdoctorWebpackSDK } from '@rsdoctor/sdk';
 import { ChunkGraph, ModuleGraph } from '@rsdoctor/graph';
 import { rules } from '@/rules/rules';
-import { RuleData } from '@rsdoctor/types/dist/linter';
 
-type InternalRules = (typeof rules)[number] & RuleData[];
+type InternalRules = Common.UnionToTuple<(typeof rules)[number]>;
 
 export interface RsdoctorWebpackPluginOptions<
   Rules extends LinterType.ExtendRuleData[],
@@ -60,7 +59,7 @@ export interface RsdoctorWebpackPluginOptions<
   innerClientPath?: string;
 }
 
-export interface RsdoctorWebpackMultiplePluginOptions<
+export interface RsdoctorMultiplePluginOptions<
   Rules extends LinterType.ExtendRuleData[] = LinterType.ExtendRuleData[],
 > extends Omit<RsdoctorWebpackPluginOptions<Rules>, 'sdkInstance'>,
     Pick<ConstructorParameters<typeof RsdoctorSlaveSDK>[0], 'stage'> {

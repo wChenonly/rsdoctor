@@ -21,13 +21,14 @@
     "@rsdoctor/types": "workspace:*",
     "@rsdoctor/utils": "workspace:*",
     "@rsdoctor/webpack-plugin": "workspace:*",
-    "@rspack/core": "0.5.1",
+    "@rspack/core": "0.6.5",
     "@types/lodash": "^4.17.0",
     "@types/node": "^16",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/webpack": "5.28.0",
     "fast-glob": "^3.3.1",
+    "loader-utils": "^2.0.4",
     "playwright": "1.33.0",
     "typescript": "^5.2.2"
   }

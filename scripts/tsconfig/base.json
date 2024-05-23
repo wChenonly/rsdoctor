@@ -6,6 +6,8 @@
     "module": "ES2020",
     "strict": true,
     "isolatedModules": true,
+    "declarationMap": true,
+    "declaration": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noUnusedLocals": true,
