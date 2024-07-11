@@ -1,14 +1,14 @@
-import type { Compiler } from '@rspack/core';
 import { Utils } from '@rsdoctor/core/build-utils';
 import path from 'path';
 import { Plugin } from '@rsdoctor/types';
 import type { RuleSetRules } from '@rspack/core';
+import { Build } from '@rsdoctor/core';
 
 const BuiltinLoaderName = 'builtin:swc-loader';
 const ESMLoaderFile = '.mjs';
 
 export class ProbeLoaderPlugin {
-  apply(compiler: Compiler) {
+  apply(compiler: Plugin.BaseCompiler) {
     compiler.hooks.beforeRun.tap(
       {
         name: 'ProbeLoaderPlugin',
@@ -28,7 +28,7 @@ export class ProbeLoaderPlugin {
     );
   }
 
-  private addProbeLoader(compiler: Compiler) {
+  private addProbeLoader(compiler: Plugin.BaseCompiler) {
     const rules = compiler.options.module.rules as Plugin.RuleSetRule[];
     const appendRule = (rule: Plugin.RuleSetRule, index: number) => {
       if ('use' in rule && Array.isArray(rule.use)) {
@@ -59,15 +59,20 @@ export class ProbeLoaderPlugin {
 
     compiler.options.module.rules = Utils.addProbeLoader2Rules(
       rules,
-      BuiltinLoaderName,
       appendRule,
+      (r: Plugin.BuildRuleSetRule) =>
+        Build.Utils.getLoaderNameMatch(r, BuiltinLoaderName, true),
     ) as RuleSetRules;
 
     compiler.options.module.rules = Utils.addProbeLoader2Rules(
       rules,
-      ESMLoaderFile,
       appendRule,
-      false,
+      (r: Plugin.BuildRuleSetRule) => {
+        return (
+          Build.Utils.getLoaderNameMatch(r, ESMLoaderFile, false) ||
+          Build.Utils.isESMLoader(r)
+        );
+      },
     ) as RuleSetRules;
   }
 }

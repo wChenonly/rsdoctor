@@ -1,6 +1,6 @@
 {
   "name": "@rsdoctor/core",
-  "version": "0.2.4",
+  "version": "0.3.7",
   "repository": {
     "type": "git",
     "url": "https://github.com/web-infra-dev/rsdoctor",
@@ -72,21 +72,21 @@
     "@rsdoctor/sdk": "workspace:*",
     "@rsdoctor/types": "workspace:*",
     "@rsdoctor/utils": "workspace:*",
-    "axios": "^1.6.1",
-    "bytes": "3.1.2",
+    "axios": "^1.7.2",
     "enhanced-resolve": "5.12.0",
+    "filesize": "^10.1.2",
     "fs-extra": "^11.1.1",
     "loader-utils": "^2.0.4",
     "lodash": "^4.17.21",
     "path-browserify": "1.0.1",
     "semver": "^7.5.4",
     "source-map": "^0.7.4",
-    "webpack-bundle-analyzer": "^4.9.1"
+    "webpack-bundle-analyzer": "^4.9.1",
+    "webpack-sources": "^3.2.3"
   },
   "devDependencies": {
-    "@rspack/core": "0.6.5",
+    "@rspack/core": "0.7.5",
     "@scripts/test-helper": "workspace:*",
-    "@types/bytes": "3.1.1",
     "@types/fs-extra": "^11.0.2",
     "@types/loader-utils": "^2.0.5",
     "@types/lodash": "^4.17.0",
@@ -96,6 +96,7 @@
     "@types/semver": "^7.5.4",
     "@types/tapable": "2.2.2",
     "@types/webpack": "5.28.0",
+    "@types/webpack-sources": "^3.2.3",
     "babel-loader": "9.1.3",
     "string-loader": "0.0.1",
     "ts-loader": "^9.5.1",

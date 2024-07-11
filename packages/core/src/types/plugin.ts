@@ -46,6 +46,11 @@ export interface RsdoctorWebpackPluginOptions<
   reportCodeType?:
     | { noModuleSource?: boolean; noAssetsAndModuleSource?: boolean }
     | undefined;
+
+  /**
+   * Whether to turn on some characteristic analysis capabilities, such as: the support for the BannerPlugin.
+   */
+  supports?: ISupport;
   /**
    * control the Rsdoctor upload data to TOS, used by inner-rsdoctor.
    * @default false
@@ -57,6 +62,11 @@ export interface RsdoctorWebpackPluginOptions<
    * @default false
    */
   innerClientPath?: string;
+
+  /**
+   * The port of the Rsdoctor server.
+   */
+  port?: number;
 }
 
 export interface RsdoctorMultiplePluginOptions<
@@ -69,18 +79,26 @@ export interface RsdoctorMultiplePluginOptions<
   name?: string;
 }
 
+interface ISupport {
+  banner?: boolean;
+  parseBundle?: boolean;
+  generateTileGraph?: boolean;
+}
+
 export interface RsdoctorPluginOptionsNormalized<
   Rules extends LinterType.ExtendRuleData[] = [],
 > extends Common.DeepRequired<
     Omit<
       RsdoctorWebpackPluginOptions<Rules>,
-      'sdkInstance' | 'linter' | 'reportCodeType'
+      'sdkInstance' | 'linter' | 'reportCodeType' | 'supports' | 'port'
     >
   > {
   features: Common.DeepRequired<Plugin.RsdoctorWebpackPluginFeatures>;
   linter: Required<LinterType.Options<Rules, InternalRules>>;
   sdkInstance?: RsdoctorWebpackSDK;
-  reportCodeType?: SDK.ToDataType;
+  port?: number;
+  reportCodeType: SDK.ToDataType;
+  supports: ISupport;
 }
 
 export interface BasePluginInstance<T extends Plugin.BaseCompiler> {
@@ -108,6 +126,10 @@ export interface RsdoctorPluginInstance<
   modulesGraph: ModuleGraph;
   ensureModulesChunksGraphApplied(compiler: T): void;
 }
+
+export interface RsdoctorRspackPluginInstance<
+  Rules extends LinterType.ExtendRuleData[] = [],
+> extends RsdoctorPluginInstance<Plugin.BaseCompilerType<'rspack'>, Rules> {}
 
 export interface RsdoctorRspackPluginOptions<
   Rules extends LinterType.ExtendRuleData[],

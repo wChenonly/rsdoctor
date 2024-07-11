@@ -1,4 +1,4 @@
-import type { Compiler, Configuration, RuleSetRule, Stats } from '@rspack/core';
+import type { Configuration, RuleSetRule } from '@rspack/core';
 import { ModuleGraph } from '@rsdoctor/graph';
 import { RsdoctorSlaveSDK, RsdoctorWebpackSDK } from '@rsdoctor/sdk';
 import {
@@ -12,9 +12,10 @@ import {
   InternalBundlePlugin,
   InternalRulesPlugin,
   InternalErrorReporterPlugin,
+  InternalBundleTagPlugin,
 } from '@rsdoctor/core/plugins';
 import type {
-  RsdoctorPluginInstance,
+  RsdoctorRspackPluginInstance,
   RsdoctorPluginOptionsNormalized,
   RsdoctorRspackPluginOptions,
 } from '@rsdoctor/core';
@@ -23,17 +24,15 @@ import {
   Linter,
   Manifest as ManifestType,
   Plugin,
-  SDK,
 } from '@rsdoctor/types';
 import path from 'path';
 import { pluginTapName, pluginTapPostOptions } from './constants';
 import { cloneDeep } from 'lodash';
 import { ProbeLoaderPlugin } from './probeLoaderPlugin';
 import { Loader } from '@rsdoctor/utils/common';
-import { BundleTagPlugin } from './bundleTagPlugin';
 
 export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
-  implements RsdoctorPluginInstance<Compiler, Rules>
+  implements RsdoctorRspackPluginInstance<Rules>
 {
   public readonly name = pluginTapName;
 
@@ -50,13 +49,24 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
   public outsideInstance: boolean;
 
   constructor(options?: RsdoctorRspackPluginOptions<Rules>) {
-    this.options = normalizeUserConfig<Rules>(options);
+    this.options = normalizeUserConfig<Rules>(
+      Object.assign(options || {}, {
+        supports: {
+          ...options?.supports,
+          // Generate Tile Graph default false in rspack builder.
+          generateTileGraph: options?.supports?.generateTileGraph
+            ? options?.supports?.generateTileGraph
+            : false,
+        },
+      }),
+    );
     this.sdk =
       this.options.sdkInstance ??
       new RsdoctorWebpackSDK({
+        port: this.options.port,
         name: pluginTapName,
         root: process.cwd(),
-        type: SDK.ToDataType.Normal,
+        type: this.options.reportCodeType,
         config: { disableTOSUpload: this.options.disableTOSUpload },
         innerClientPath: this.options.innerClientPath,
       });
@@ -67,7 +77,7 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
   // avoid hint error from ts type validation
   apply(compiler: unknown): unknown;
 
-  apply(compiler: Compiler) {
+  apply(compiler: Plugin.BaseCompilerType<'rspack'>) {
     // bootstrap sdk in apply()
     // avoid to has different sdk instance in one plugin, because of webpack-chain toConfig() will new every webpack plugins.
     if (!this._bootstrapTask) {
@@ -90,20 +100,30 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
 
     // TODO: to fix the TypeError: Type instantiation is excessively deep and possibly infinite.
     // @ts-ignore
-    new InternalSummaryPlugin<Compiler>(this).apply(compiler);
+    new InternalSummaryPlugin<Plugin.BaseCompilerType<'rspack'>>(this).apply(
+      compiler,
+    );
 
     if (this.options.features.loader && !Loader.isVue(compiler)) {
       new ProbeLoaderPlugin().apply(compiler);
-      new InternalLoaderPlugin<Compiler>(this).apply(compiler);
+      new InternalLoaderPlugin<Plugin.BaseCompilerType<'rspack'>>(this).apply(
+        compiler,
+      );
     }
 
     if (this.options.features.plugins) {
-      new InternalPluginsPlugin<Compiler>(this).apply(compiler);
+      new InternalPluginsPlugin<Plugin.BaseCompilerType<'rspack'>>(this).apply(
+        compiler,
+      );
     }
 
     if (this.options.features.bundle) {
-      new InternalBundlePlugin<Compiler>(this).apply(compiler);
-      new BundleTagPlugin().apply(compiler);
+      new InternalBundlePlugin<Plugin.BaseCompilerType<'rspack'>>(this).apply(
+        compiler,
+      );
+      new InternalBundleTagPlugin<Plugin.BaseCompilerType<'rspack'>>(
+        this,
+      ).apply(compiler);
     }
 
     new InternalRulesPlugin(this).apply(compiler);
@@ -118,23 +138,16 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
    * @return {*}
    * @memberof RsdoctorWebpackPlugin
    */
-  public ensureModulesChunksGraphApplied(compiler: Compiler) {
+  public ensureModulesChunksGraphApplied(
+    compiler: Plugin.BaseCompilerType<'rspack'>,
+  ) {
     ensureModulesChunksGraphFn(compiler, this);
   }
 
-  public done = async (compiler: Compiler, stats: Stats): Promise<void> => {
-    const json = stats.toJson({
-      all: false,
-      version: true,
-      chunks: true,
-      modules: true,
-      chunkModules: true,
-      assets: true,
-      builtAt: true,
-      chunkRelations: true,
-    }) as Plugin.StatsCompilation; // TODO: if this type can compatible?
-
-    this.getRspackConfig(compiler, json.rspackVersion || '');
+  public done = async (
+    compiler: Plugin.BaseCompilerType<'rspack'>,
+  ): Promise<void> => {
+    this.getRspackConfig(compiler);
 
     await this.sdk.bootstrap();
 
@@ -164,7 +177,7 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
     }
   };
 
-  public getRspackConfig(compiler: Compiler, version: string) {
+  public getRspackConfig(compiler: Plugin.BaseCompilerType<'rspack'>) {
     if (compiler.isChild()) return;
     const { plugins, infrastructureLogging, ...rest } = compiler.options;
     const _rest = cloneDeep(rest);
@@ -177,10 +190,13 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
       plugins: plugins.map((e) => e?.constructor.name),
     } as unknown as Configuration;
 
-    // save webpack configuration to sdk
+    const rspackVersion = compiler.webpack?.rspackVersion;
+    const webpackVersion = compiler.webpack?.version;
+
+    // save webpack or rspack configuration to sdk
     this.sdk.reportConfiguration({
-      name: 'rspack',
-      version: version || 'unknown',
+      name: rspackVersion ? 'rspack' : 'webpack',
+      version: rspackVersion || webpackVersion || 'unknown',
       config: configuration,
     });
 

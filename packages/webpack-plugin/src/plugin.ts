@@ -9,6 +9,7 @@ import {
   makeRulesSerializable,
   normalizeUserConfig,
   setSDK,
+  InternalBundleTagPlugin,
 } from '@rsdoctor/core/plugins';
 import type {
   RsdoctorPluginInstance,
@@ -53,6 +54,7 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
     this.sdk =
       this.options.sdkInstance ??
       new RsdoctorWebpackSDK({
+        port: this.options.port,
         name: pluginTapName,
         root: process.cwd(),
         type: this.options.reportCodeType,
@@ -96,6 +98,7 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
 
     if (this.options.features.bundle) {
       new InternalBundlePlugin<Compiler>(this).apply(compiler);
+      new InternalBundleTagPlugin<Compiler>(this).apply(compiler);
     }
 
     // InternalErrorReporterPlugin must called before InternalRulesPlugin, to avoid treat Rsdoctor's lint warnings/errors as Webpack's warnings/errors.
@@ -134,10 +137,14 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
       plugins: plugins.map((e) => e?.constructor.name),
     } as unknown as Configuration;
 
-    // save webpack configuration to sdk
+    // @ts-expect-error
+    const rspackVersion = compiler.webpack?.rspackVersion;
+    const webpackVersion = compiler.webpack?.version;
+
+    // save webpack or rspack configuration to sdk
     this.sdk.reportConfiguration({
-      name: 'webpack',
-      version: compiler.webpack?.version || 'unknown',
+      name: rspackVersion ? 'rspack' : 'webpack',
+      version: rspackVersion || webpackVersion || 'unknown',
       config: configuration,
     });
 

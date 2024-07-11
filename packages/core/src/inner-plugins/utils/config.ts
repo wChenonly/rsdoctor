@@ -27,6 +27,8 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
     reportCodeType = { noModuleSource: false, noAssetsAndModuleSource: false },
     disableTOSUpload = false,
     innerClientPath = '',
+    supports = { parseBundle: true, banner: false, generateTileGraph: true },
+    port,
   } = config;
 
   assert(linter && typeof linter === 'object');
@@ -84,13 +86,15 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
       ? reportCodeType.noModuleSource
         ? SDK.ToDataType.Lite
         : reportCodeType.noAssetsAndModuleSource
-        ? SDK.ToDataType.LiteAndNoAsset
-        : SDK.ToDataType.Normal
+          ? SDK.ToDataType.LiteAndNoAsset
+          : SDK.ToDataType.Normal
       : _features.lite
-      ? SDK.ToDataType.Lite
-      : SDK.ToDataType.Normal,
+        ? SDK.ToDataType.Lite
+        : SDK.ToDataType.Normal,
     disableTOSUpload,
     innerClientPath,
+    supports,
+    port,
   };
 
   return res;
