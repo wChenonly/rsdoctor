@@ -30,6 +30,17 @@ async function rspackCompile(tapName: string, compile: typeof compileByRspack) {
           use: loader,
         },
         {
+          test: /\.css$/,
+          use: [
+            {
+              loader: 'builtin:lightningcss-loader',
+              options: {
+                targets: 'ie 10',
+              },
+            },
+          ],
+        },
+        {
           test: /\.js/,
           use: esmLoaderJs,
         },
@@ -56,7 +67,7 @@ async function rspackCompile(tapName: string, compile: typeof compileByRspack) {
       // @ts-ignore
       createRsdoctorPlugin({}),
       {
-        name: 'XXX',
+        name: 'Foo',
         apply(compiler: Compiler) {
           compiler.hooks.done.tapPromise(tapName, async () => {
             // nothing
@@ -67,7 +78,7 @@ async function rspackCompile(tapName: string, compile: typeof compileByRspack) {
             });
           });
           compiler.hooks.beforeRun.tapPromise(
-            { name: 'XXX', stage: 99999 },
+            { name: 'Foo', stage: 99999 },
             async () => {
               const sdk = getSDK();
               setSDK(
@@ -103,7 +114,7 @@ async function rspackCompile(tapName: string, compile: typeof compileByRspack) {
 }
 
 test('rspack plugin intercept', async () => {
-  const tapName = 'XXX';
+  const tapName = 'Foo';
   await rspackCompile(tapName, compileByRspack);
   const sdk = getSDK();
   const { done, thisCompilation } = sdk.getStoreData().plugin;
@@ -121,7 +132,7 @@ test('rspack plugin intercept', async () => {
 });
 
 test('rspack data store', async () => {
-  const tapName = 'XXX';
+  const tapName = 'Foo';
   await rspackCompile(tapName, compileByRspack);
   const sdk = getSDK();
   const datas = sdk.getStoreData();
@@ -148,5 +159,5 @@ test('rspack data store', async () => {
   const ruleLengthList = configs[0].config.module?.rules?.map(
     (_rule) => (_rule as RuleSetRule)?.use?.length,
   );
-  expect(ruleLengthList).toEqual([1, 3, 3]);
+  expect(ruleLengthList).toEqual([1, 3, 3, 3]);
 });

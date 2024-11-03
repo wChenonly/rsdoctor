@@ -1,6 +1,6 @@
 {
   "name": "@rsdoctor/webpack-plugin",
-  "version": "0.3.7",
+  "version": "0.4.7",
   "repository": {
     "type": "git",
     "url": "https://github.com/web-infra-dev/rsdoctor",
@@ -28,13 +28,12 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "webpack": "^5.89.0",
-    "@types/fs-extra": "^11.0.2",
-    "@types/lodash": "^4.17.0",
+    "webpack": "^5.95.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/lodash": "^4.17.10",
     "@types/node": "^16",
-    "@types/tapable": "2.2.2",
-    "@types/webpack": "5.28.0",
-    "tslib": "2.4.1",
+    "@types/tapable": "2.2.7",
+    "tslib": "2.7.0",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {

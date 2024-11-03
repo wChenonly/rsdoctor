@@ -1,9 +1,9 @@
 import { Common, SDK, Thirdparty, Client } from '@rsdoctor/types';
 import { Server } from '@rsdoctor/utils/build';
+import serve from 'serve-static';
 import { Bundle } from '@rsdoctor/utils/common';
 import assert from 'assert';
 import bodyParser from 'body-parser';
-import ip from 'ip';
 import cors from 'cors';
 import { PassThrough } from 'stream';
 import { Socket } from './socket';
@@ -11,7 +11,12 @@ import { Router } from './router';
 import * as APIs from './apis';
 import { chalk, logger } from '@rsdoctor/utils/logger';
 import { openBrowser } from '@/sdk/utils/openBrowser';
+import path from 'path';
+import { getLocalIpAddress } from './utils';
+import { isUndefined } from 'lodash';
 export * from './utils';
+
+export type ISocketType = { port: number; socketUrl: string };
 
 export class RsdoctorServer implements SDK.RsdoctorServerInstance {
   private _server!: Common.PromiseReturnType<typeof Server.createServer>;
@@ -26,16 +31,21 @@ export class RsdoctorServer implements SDK.RsdoctorServerInstance {
 
   private _innerClientPath: string;
 
+  private _printServerUrl: boolean;
+
   constructor(
     protected sdk: SDK.RsdoctorBuilderSDKInstance,
     port = Server.defaultPort,
-    innerClientPath = '',
+    config?: { innerClientPath?: string; printServerUrl?: boolean },
   ) {
     assert(typeof port === 'number');
     // maybe the port will be rewrite in bootstrap()
     this.port = port;
     this._router = new Router({ sdk, server: this, apis: Object.values(APIs) });
-    this._innerClientPath = innerClientPath;
+    this._innerClientPath = config?.innerClientPath || '';
+    this._printServerUrl = isUndefined(config?.printServerUrl)
+      ? true
+      : config?.printServerUrl;
   }
 
   public get app(): SDK.RsdoctorServerInstance['app'] {
@@ -43,7 +53,7 @@ export class RsdoctorServer implements SDK.RsdoctorServerInstance {
   }
 
   public get host(): string {
-    const host = ip.address();
+    const host = getLocalIpAddress();
     return host;
   }
 
@@ -51,8 +61,11 @@ export class RsdoctorServer implements SDK.RsdoctorServerInstance {
     return `http://${this.host}:${this.port}`;
   }
 
-  public get socketUrl(): string {
-    return `ws://localhost:${this.port}`;
+  public get socketUrl(): ISocketType {
+    return {
+      port: this.port,
+      socketUrl: `ws://localhost:${this.port}`,
+    };
   }
 
   public get innerClientPath(): string {
@@ -79,6 +92,11 @@ export class RsdoctorServer implements SDK.RsdoctorServerInstance {
 
     this.app.use(cors());
     this.app.use(bodyParser.json({ limit: '500mb' }));
+    const clientHtmlPath = this._innerClientPath
+      ? this._innerClientPath
+      : require.resolve('@rsdoctor/client');
+    const clientDistPath = path.resolve(clientHtmlPath, '..');
+    this.app.use(serve(clientDistPath));
 
     await this._router.setup();
 
@@ -194,13 +212,18 @@ export class RsdoctorServer implements SDK.RsdoctorServerInstance {
     const relativeUrl = this.getClientUrl(
       ...(args as Parameters<SDK.RsdoctorServerInstance['getClientUrl']>),
     );
+
+    const needEncodeURI =
+      arguments[0] === Client.RsdoctorClientRoutes.BundleDiff;
     const url = `http://${this.host}:${this.port}${relativeUrl}`;
     const localhostUrl = `http://localhost:${this.port}${relativeUrl}`;
-    await openBrowser(localhostUrl);
-    logger.info(`Rsdoctor analyze server running on: ${chalk.cyan(url)}`);
-    logger.info(
-      `Rsdoctor analyze server running on: ${chalk.cyan(localhostUrl)}`,
-    );
+    await openBrowser(localhostUrl, !needEncodeURI);
+    if (this._printServerUrl) {
+      logger.info(`Rsdoctor analyze server running on: ${chalk.cyan(url)}`);
+      logger.info(
+        `Rsdoctor analyze server running on: ${chalk.cyan(localhostUrl)}`,
+      );
+    }
   }
 
   public sendAPIDataToClient<

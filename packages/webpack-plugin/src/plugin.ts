@@ -17,10 +17,10 @@ import type {
   RsdoctorWebpackPluginOptions,
 } from '@rsdoctor/core/types';
 import { ChunkGraph, ModuleGraph } from '@rsdoctor/graph';
-import { RsdoctorWebpackSDK } from '@rsdoctor/sdk';
-import { Constants, Linter } from '@rsdoctor/types';
+import { openBrowser, RsdoctorWebpackSDK } from '@rsdoctor/sdk';
+import { Constants, Linter, Manifest, SDK } from '@rsdoctor/types';
 import { Process } from '@rsdoctor/utils/build';
-import { debug } from '@rsdoctor/utils/logger';
+import { chalk, debug } from '@rsdoctor/utils/logger';
 import { cloneDeep } from 'lodash';
 import path from 'path';
 import type { Compiler, Configuration, RuleSetRule } from 'webpack';
@@ -29,6 +29,7 @@ import { pluginTapName, pluginTapPostOptions } from './constants';
 import { InternalResolverPlugin } from './plugins/resolver';
 import { ensureModulesChunksGraphFn } from '@rsdoctor/core/plugins';
 import { Loader } from '@rsdoctor/utils/common';
+import { Loader as BuildUtilLoader } from '@rsdoctor/core/build-utils';
 
 export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
   implements RsdoctorPluginInstance<Compiler, Rules>
@@ -39,9 +40,9 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
 
   public readonly sdk: RsdoctorWebpackSDK;
 
-  public modulesGraph: ModuleGraph;
+  public readonly isRsdoctorPlugin: boolean;
 
-  private outsideInstance = false;
+  public modulesGraph: ModuleGraph;
 
   public _bootstrapTask!: Promise<unknown>;
 
@@ -58,12 +59,17 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
         name: pluginTapName,
         root: process.cwd(),
         type: this.options.reportCodeType,
-        config: { disableTOSUpload: this.options.disableTOSUpload },
-        innerClientPath: this.options.innerClientPath,
+        config: {
+          disableTOSUpload: this.options.disableTOSUpload,
+          innerClientPath: this.options.innerClientPath,
+          printLog: this.options.printLog,
+          mode: this.options.mode ? this.options.mode : undefined,
+          brief: this.options.brief,
+        },
       });
-    this.outsideInstance = Boolean(this.options.sdkInstance);
     this.modulesGraph = new ModuleGraph();
     this.chunkGraph = new ChunkGraph();
+    this.isRsdoctorPlugin = true;
   }
 
   // avoid hint error from ts type validation
@@ -77,15 +83,22 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
     }
 
     // External instances do not need to be injected into the global.
-    if (!this.outsideInstance) {
-      setSDK(this.sdk);
-    }
+    setSDK(this.sdk);
+
     // TODO: to fix the TypeError: Type instantiation is excessively deep and possibly infinite.
     // @ts-ignore
     new InternalSummaryPlugin<Compiler>(this).apply(compiler);
 
-    if (this.options.features.loader && !Loader.isVue(compiler)) {
-      new InternalLoaderPlugin<Compiler>(this).apply(compiler);
+    if (this.options.features.loader) {
+      new BuildUtilLoader.ProbeLoaderPlugin().apply(compiler);
+      // add loader page to client
+      this.sdk.addClientRoutes([
+        Manifest.RsdoctorManifestClientRoutes.WebpackLoaders,
+      ]);
+
+      if (!Loader.isVue(compiler)) {
+        new InternalLoaderPlugin(this).apply(compiler);
+      }
     }
 
     if (this.options.features.resolver) {
@@ -149,7 +162,10 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
     });
 
     this.sdk.setOutputDir(
-      path.resolve(compiler.outputPath, `./${Constants.RsdoctorOutputFolder}`),
+      path.resolve(
+        this.options.reportDir || compiler.outputPath,
+        `./${Constants.RsdoctorOutputFolder}`,
+      ),
     );
 
     if (configuration.name) {
@@ -162,8 +178,10 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
 
     await this._bootstrapTask.then(() => {
       if (!this.options.disableClientServer && !this.browserIsOpened) {
-        this.browserIsOpened = true;
-        this.sdk.server.openClientPage();
+        if (this.options.mode !== SDK.IMode[SDK.IMode.brief]) {
+          this.browserIsOpened = true;
+          this.sdk.server.openClientPage();
+        }
       }
     });
   };
@@ -188,7 +206,21 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
       if (this.options.disableClientServer) {
         await this.sdk.dispose();
         debug(Process.getMemoryUsageMessage, '[After SDK Dispose]');
+      } else if (
+        this.options.mode === SDK.IMode[SDK.IMode.brief] &&
+        !this.options.disableClientServer
+      ) {
+        const outputFilePath = path.resolve(
+          this.sdk.outputDir,
+          this.options.brief.reportHtmlName || 'rsdoctor-report.html',
+        );
+        console.log(
+          `${chalk.green('[RSDOCTOR] generated brief report')}: ${outputFilePath}`,
+        );
+        openBrowser(`file:///${outputFilePath}`);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(`[Rsdoctor] Webpack plugin this.done error`, e);
+    }
   };
 }

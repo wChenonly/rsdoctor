@@ -18,8 +18,8 @@ import {
 
 const {
   ENABLE_DEVTOOLS_PLUGIN,
-  OFFICAL_PREVIEW_PUBLIC_PATH,
-  OFFICAL_DEMO_MANIFEST_PATH,
+  OFFICIAL_PREVIEW_PUBLIC_PATH,
+  OFFICIAL_DEMO_MANIFEST_PATH,
   ENABLE_CLIENT_SERVER,
 } = process.env;
 
@@ -41,14 +41,19 @@ export default defineConfig(({ env }) => {
       define: {
         'process.env.NODE_DEBUG': JSON.stringify(false),
         'process.env.NODE_ENV': JSON.stringify(env),
-        'process.env.OFFICAL_DEMO_MANIFEST_PATH': JSON.stringify(
-          OFFICAL_DEMO_MANIFEST_PATH,
+        'process.env.OFFICIAL_DEMO_MANIFEST_PATH': JSON.stringify(
+          OFFICIAL_DEMO_MANIFEST_PATH,
         ),
         'process.env.LOCAL_CLI_PORT': JSON.stringify(PortForCLI),
       },
     },
 
     output: {
+      externals: [
+        '@rsbuild/core',
+        '@rsbuild/plugin-node-polyfill',
+        '@rsbuild/plugin-react',
+      ],
       distPath: {
         root: path.basename(DistPath),
         js: 'resource/js',
@@ -59,8 +64,8 @@ export default defineConfig(({ env }) => {
         media: 'resource/media',
       },
       assetPrefix: IS_PRODUCTION
-        ? OFFICAL_PREVIEW_PUBLIC_PATH?.replace(/\/resource$/, '') || '/'
-        : '/',
+        ? OFFICIAL_PREVIEW_PUBLIC_PATH?.replace(/\/resource$/, '') || './'
+        : './',
       cleanDistPath: IS_PRODUCTION,
       sourceMap: {
         js: false,
@@ -81,6 +86,39 @@ export default defineConfig(({ env }) => {
               chunks: 'all',
               maxSize: 1000000,
               minSize: 500000,
+            },
+            react: {
+              test: /node_modules\/react-*/,
+              name: 'react',
+              chunks: 'all',
+            },
+            rc: {
+              test: /node_modules\/rc-*/,
+              name: 'rc',
+              chunks: 'all',
+              maxSize: 1000000,
+              minSize: 500000,
+            },
+            antDesign: {
+              chunks: 'all',
+              name: 'ant-design',
+              test: /node_modules\/antd\//,
+              maxSize: 1000000,
+              minSize: 500000,
+            },
+            antDesignIcons: {
+              chunks: 'all',
+              name: 'ant-design-icons',
+              test: /node_modules\/@ant-design\/icons/,
+              maxSize: 1000000,
+              minSize: 50000,
+            },
+            vender: {
+              chunks: 'all',
+              name: 'vender',
+              test: /node_modules\/(acorn|lodash|i18next|socket.io-*|axios|remark-*)/,
+              maxSize: 1000000,
+              minSize: 200000,
             },
           },
         },

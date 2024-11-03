@@ -27,6 +27,7 @@ export default defineConfig({
             },
           },
           port: 9988,
+          mode: 'brief',
         },
       ]);
     },

@@ -1,6 +1,14 @@
 import React, { useState, useEffect, memo } from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
+import { CustomChart } from 'echarts/charts';
+import {
+  TooltipComponent,
+  GridComponent,
+  DataZoomComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+
 import dayjs from 'dayjs';
 import { ChartProps, DurationMetric, ITraceEventData } from '../types';
 import { groupBy } from 'lodash-es';
@@ -29,7 +37,16 @@ export const TimelineCom: React.FC<{
 }> = memo(({ loaderData, pluginsData, formatterFn, chartType = 'normal' }) => {
   const data: LoaderType[] = [];
   let categories: string[] = [];
-  const [optionsData, setOptinsData] = useState({});
+  const [optionsData, setOptionsData] = useState({});
+
+  // Register the required components
+  echarts.use([
+    CustomChart,
+    TooltipComponent,
+    GridComponent,
+    DataZoomComponent,
+    CanvasRenderer,
+  ]);
 
   useEffect(() => {
     if (!loaderData) return;
@@ -242,11 +259,11 @@ export const TimelineCom: React.FC<{
         },
       ],
     };
-    setOptinsData(option);
+    setOptionsData(option);
   }, [loaderData, pluginsData]);
 
   return (
-    <ReactECharts
+    <ReactEChartsCore
       option={optionsData}
       echarts={echarts}
       style={{ width: '100%', minHeight: '400px' }}

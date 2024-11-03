@@ -9,6 +9,7 @@ import {
 import {
   RsdoctorWebpackPluginOptions,
   RsdoctorPluginOptionsNormalized,
+  IReportCodeType,
 } from '@/types';
 
 function defaultBoolean(v: unknown, dft: boolean): boolean {
@@ -24,11 +25,29 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
     loaderInterceptorOptions = {},
     disableClientServer = false,
     sdkInstance,
-    reportCodeType = { noModuleSource: false, noAssetsAndModuleSource: false },
+    reportCodeType = {
+      noModuleSource: false,
+      noAssetsAndModuleSource: false,
+      noCode: false,
+      sourceCode: true,
+      assetsCode: true,
+    },
     disableTOSUpload = false,
     innerClientPath = '',
-    supports = { parseBundle: true, banner: false, generateTileGraph: true },
+    supports = {
+      parseBundle: true,
+      banner: undefined,
+      generateTileGraph: true,
+    },
     port,
+    printLog = { serverUrls: true },
+    mode = 'normal',
+    brief = {
+      reportHtmlDir: undefined,
+      reportHtmlName: undefined,
+      writeDataJson: false,
+    },
+    reportDir = '',
   } = config;
 
   assert(linter && typeof linter === 'object');
@@ -47,7 +66,7 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
         resolver: features.includes('resolver'),
         bundle: features.includes('bundle'),
         treeShaking: features.includes('treeShaking'),
-        lite: features.includes('lite'),
+        lite: features.includes('lite') || mode === SDK.IMode[SDK.IMode.lite],
       }
     : {
         loader: defaultBoolean(features.loader, true),
@@ -55,7 +74,9 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
         resolver: defaultBoolean(features.resolver, false),
         bundle: defaultBoolean(features.bundle, true),
         treeShaking: defaultBoolean(features.treeShaking, false),
-        lite: defaultBoolean(features.lite, false),
+        lite:
+          defaultBoolean(features.lite, false) ||
+          mode === SDK.IMode[SDK.IMode.lite],
       };
 
   const _linter: RsdoctorPluginOptionsNormalized<Rules>['linter'] = {
@@ -82,19 +103,15 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
      * The third type: reportCodeType.noAssetsAndModuleSource means there is no module source code nor the packaged product code.
      *
      *  */
-    reportCodeType: reportCodeType
-      ? reportCodeType.noModuleSource
-        ? SDK.ToDataType.Lite
-        : reportCodeType.noAssetsAndModuleSource
-          ? SDK.ToDataType.LiteAndNoAsset
-          : SDK.ToDataType.Normal
-      : _features.lite
-        ? SDK.ToDataType.Lite
-        : SDK.ToDataType.Normal,
+    reportCodeType: normalizeReportType(reportCodeType, mode),
     disableTOSUpload,
     innerClientPath,
     supports,
     port,
+    printLog,
+    mode,
+    brief,
+    reportDir,
   };
 
   return res;
@@ -154,3 +171,35 @@ export function makeRulesSerializable(
     }
   });
 }
+
+export const normalizeReportType = (
+  reportCodeType: IReportCodeType,
+  mode: keyof typeof SDK.IMode,
+): SDK.ToDataType => {
+  let globalReportCodeType = SDK.ToDataType.Normal;
+
+  switch (mode) {
+    case SDK.IMode[SDK.IMode.brief]:
+      globalReportCodeType = SDK.ToDataType.NoCode;
+      break;
+    case SDK.IMode[SDK.IMode.lite]:
+      if (reportCodeType.noAssetsAndModuleSource) {
+        globalReportCodeType = SDK.ToDataType.NoSourceAndAssets;
+      } else {
+        globalReportCodeType = SDK.ToDataType.NoSource;
+      }
+      break;
+    default: {
+      if (reportCodeType.noCode) {
+        globalReportCodeType = SDK.ToDataType.NoCode;
+      } else if (reportCodeType.noModuleSource) {
+        globalReportCodeType = SDK.ToDataType.NoSource;
+      } else if (reportCodeType.noAssetsAndModuleSource) {
+        globalReportCodeType = SDK.ToDataType.NoSourceAndAssets;
+      } else {
+        globalReportCodeType = SDK.ToDataType.Normal;
+      }
+    }
+  }
+  return globalReportCodeType;
+};

@@ -84,12 +84,13 @@ export enum ModuleKind {
 }
 
 export enum ToDataType {
+  NoCode,
   /** Normal mode */
   Normal,
-  /** Lite mode */
-  Lite,
+  /** Lite mode: no source code */
+  NoSource,
   /** Lite & No Assets Code mode */
-  LiteAndNoAsset,
+  NoSourceAndAssets,
   /** All Data, include module transformed data. */
   All,
 }
@@ -159,7 +160,7 @@ export interface ModuleInstance {
   getSourceRange(transformed: SourceRange): SourceRange | undefined;
   /** Add connected submodules */
   addNormalModule(module: ModuleInstance): void;
-  /** If it is currently a connection module, return all connected base subpackages */
+  /** If it is currently a connection module, return all connected base sub packages */
   getNormalModules(): ModuleInstance[];
   /** Added aggregation module */
   addConcatenationModule(module: ModuleInstance): void;

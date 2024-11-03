@@ -1,0 +1,205 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`test addProbeLoader2Rules for vue-loader > addProbeLoader2Rules() 1`] = `
+[
+  {
+    "test": /\\\\\\.less\\$/,
+    "type": "css",
+    "use": [
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "loader": "less-loader",
+          "type": "end",
+        },
+      },
+      {
+        "loader": "less-loader",
+      },
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "loader": "less-loader",
+          "type": "start",
+        },
+      },
+    ],
+  },
+  {
+    "test": /\\\\\\.module\\\\\\.less\\$/,
+    "type": "css/module",
+    "use": [
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "loader": "less-loader",
+          "type": "end",
+        },
+      },
+      {
+        "loader": "less-loader",
+      },
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "loader": "less-loader",
+          "type": "start",
+        },
+      },
+    ],
+  },
+  {
+    "test": /\\\\\\.svg\\$/,
+    "use": [
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "loader": "@svgr/webpack",
+          "type": "end",
+        },
+      },
+      {
+        "loader": "@svgr/webpack",
+      },
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "loader": "@svgr/webpack",
+          "type": "start",
+        },
+      },
+    ],
+  },
+  {
+    "rules": [
+      {
+        "experimentalInlineMatchResource": true,
+        "loader": undefined,
+        "options": undefined,
+        "use": [
+          {
+            "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+            "options": {
+              "builderName": "test-compiler",
+              "ident": undefined,
+              "loader": "vue-loader",
+              "type": "end",
+            },
+          },
+          {
+            "ident": undefined,
+            "loader": "vue-loader",
+            "options": undefined,
+          },
+          {
+            "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+            "options": {
+              "builderName": "test-compiler",
+              "ident": undefined,
+              "loader": "vue-loader",
+              "type": "start",
+            },
+          },
+        ],
+      },
+    ],
+    "test": /\\\\\\.vue\\$/,
+  },
+  {
+    "test": /\\\\\\.ts\\$/,
+    "type": "javascript/auto",
+    "use": [
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "jsc": {
+            "externalHelpers": true,
+            "parser": {
+              "syntax": "typescript",
+            },
+            "preserveAllComments": false,
+          },
+          "loader": "builtin:swc-loader",
+          "sourceMap": true,
+          "type": "end",
+        },
+      },
+      {
+        "loader": "builtin:swc-loader",
+        "options": {
+          "jsc": {
+            "externalHelpers": true,
+            "parser": {
+              "syntax": "typescript",
+            },
+            "preserveAllComments": false,
+          },
+          "sourceMap": true,
+        },
+      },
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "jsc": {
+            "externalHelpers": true,
+            "parser": {
+              "syntax": "typescript",
+            },
+            "preserveAllComments": false,
+          },
+          "loader": "builtin:swc-loader",
+          "sourceMap": true,
+          "type": "start",
+        },
+      },
+    ],
+  },
+  {
+    "loader": undefined,
+    "options": undefined,
+    "test": /\\\\\\.svg\\$/,
+    "type": "asset/resource",
+    "use": [
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "loader": "svg-loader",
+          "type": "end",
+        },
+      },
+      {
+        "ident": undefined,
+        "loader": "svg-loader",
+        "options": undefined,
+      },
+      {
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
+        "options": {
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "loader": "svg-loader",
+          "type": "start",
+        },
+      },
+    ],
+  },
+]
+`;

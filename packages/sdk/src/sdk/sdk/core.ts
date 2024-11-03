@@ -42,7 +42,10 @@ export abstract class SDKCore<T extends RsdoctorSDKOptions>
     this._name = name;
     this.root = root;
     this.pid = process.pid;
-    this._outputDir = path.join(this.root, Constants.RsdoctorOutputFolder);
+    this._outputDir = path.join(
+      this.outputDir || this.root,
+      Constants.RsdoctorOutputFolder,
+    );
   }
 
   get outputDir() {
@@ -125,28 +128,39 @@ export abstract class SDKCore<T extends RsdoctorSDKOptions>
     this.diskManifestPath = manifest;
     await File.fse.ensureDir(outputDir);
 
-    /** write sharding files and get disk result */
-    const dataUrls: DataWithUrl[] = await Promise.all(
-      Object.keys(storeData).map(async (key) => {
-        const data = storeData[key];
-        // not use filesharding when the data is not object.
-        if (typeof data !== 'object') {
-          return {
-            name: key,
-            files: data,
-          };
+    const urlsPromiseList: (Promise<DataWithUrl> | DataWithUrl)[] = [];
+
+    for (let key of Object.keys(storeData)) {
+      const data = storeData[key];
+      // not use filesharding when the data is not object.
+      if (typeof data !== 'object') {
+        urlsPromiseList.push({
+          name: key,
+          files: data,
+        });
+        continue;
+      }
+      const jsonStr: string | string[] = await (async () => {
+        try {
+          return JSON.stringify(data);
+        } catch (error) {
+          // use the stream json stringify when call JSON.stringify failed due to the json is too large.
+          return Json.stringify(data);
         }
-        const jsonstr: string = await (async () => {
-          try {
-            return JSON.stringify(data);
-          } catch (error) {
-            // use the stream json stringify when call JSON.stringify failed due to the json is too large.
-            return Json.stringify(data);
-          }
-        })();
-        return this.writeToFolder(jsonstr, outputDir, key);
-      }),
-    );
+      })();
+
+      if (Array.isArray(jsonStr)) {
+        const urls = jsonStr.map((str, index) => {
+          return this.writeToFolder(str, outputDir, key, index + 1);
+        });
+        urlsPromiseList.push(...urls);
+      } else {
+        urlsPromiseList.push(this.writeToFolder(jsonStr, outputDir, key));
+      }
+    }
+
+    /** write sharding files and get disk result */
+    const dataUrls: DataWithUrl[] = await Promise.all(urlsPromiseList);
 
     debug(
       () =>
@@ -191,13 +205,14 @@ export abstract class SDKCore<T extends RsdoctorSDKOptions>
   }
 
   protected writeToFolder(
-    jsonstr: string,
+    jsonStr: string,
     dir: string,
     key: string,
+    index?: number,
   ): Promise<DataWithUrl> {
-    const sharding = new File.FileSharding(Algorithm.compressText(jsonstr));
+    const sharding = new File.FileSharding(Algorithm.compressText(jsonStr));
     const folder = path.resolve(dir, key);
-    const writer = sharding.writeStringToFolder(folder);
+    const writer = sharding.writeStringToFolder(folder, '', index);
     return writer.then((item) => {
       const res: DataWithUrl = {
         name: key,

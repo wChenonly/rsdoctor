@@ -42,7 +42,7 @@ async function webpack(tapName: string, compile: typeof compileByWebpack5) {
 }
 
 test('webpack5 plugins tests', async () => {
-  const tapName = 'XXX';
+  const tapName = 'Foo';
   await webpack(tapName, compileByWebpack5);
   const sdk = getSDK();
   const { done, seal } = sdk.getStoreData().plugin;
@@ -64,7 +64,7 @@ test('webpack5 plugins tests', async () => {
   expect(assets[0].content.length).toBeGreaterThan(10);
   os.EOL === '\n' &&
     expect(assets[0].content).toStrictEqual(
-      "/******/ (() => { // webpackBootstrap\nvar __webpack_exports__ = {};\nconsole.log('a');\n\n// hello world\n/******/ })()\n;",
+      "/******/ (() => { // webpackBootstrap\nconsole.log('a');\n\n// hello world\n/******/ })()\n;",
     );
 
   expect(chunks.length).toBe(1);

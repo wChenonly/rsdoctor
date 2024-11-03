@@ -1,6 +1,10 @@
 import type { Configuration, RuleSetRule } from '@rspack/core';
 import { ModuleGraph } from '@rsdoctor/graph';
-import { RsdoctorSlaveSDK, RsdoctorWebpackSDK } from '@rsdoctor/sdk';
+import {
+  openBrowser,
+  RsdoctorSlaveSDK,
+  RsdoctorWebpackSDK,
+} from '@rsdoctor/sdk';
 import {
   InternalLoaderPlugin,
   InternalPluginsPlugin,
@@ -19,17 +23,21 @@ import type {
   RsdoctorPluginOptionsNormalized,
   RsdoctorRspackPluginOptions,
 } from '@rsdoctor/core';
+import { Loader as BuildUtilLoader } from '@rsdoctor/core/build-utils';
 import {
   Constants,
   Linter,
+  Manifest,
   Manifest as ManifestType,
   Plugin,
+  SDK,
 } from '@rsdoctor/types';
 import path from 'path';
 import { pluginTapName, pluginTapPostOptions } from './constants';
 import { cloneDeep } from 'lodash';
-import { ProbeLoaderPlugin } from './probeLoaderPlugin';
+
 import { Loader } from '@rsdoctor/utils/common';
+import { chalk } from '@rsdoctor/utils/logger';
 
 export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
   implements RsdoctorRspackPluginInstance<Rules>
@@ -37,6 +45,8 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
   public readonly name = pluginTapName;
 
   public readonly sdk: RsdoctorWebpackSDK | RsdoctorSlaveSDK;
+
+  public readonly isRsdoctorPlugin: boolean;
 
   public _bootstrapTask!: Promise<unknown>;
 
@@ -67,11 +77,17 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
         name: pluginTapName,
         root: process.cwd(),
         type: this.options.reportCodeType,
-        config: { disableTOSUpload: this.options.disableTOSUpload },
-        innerClientPath: this.options.innerClientPath,
+        config: {
+          disableTOSUpload: this.options.disableTOSUpload,
+          innerClientPath: this.options.innerClientPath,
+          printLog: this.options.printLog,
+          mode: this.options.mode ? this.options.mode : undefined,
+          brief: this.options.brief,
+        },
       });
     this.outsideInstance = Boolean(this.options.sdkInstance);
     this.modulesGraph = new ModuleGraph();
+    this.isRsdoctorPlugin = true;
   }
 
   // avoid hint error from ts type validation
@@ -104,11 +120,18 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
       compiler,
     );
 
-    if (this.options.features.loader && !Loader.isVue(compiler)) {
-      new ProbeLoaderPlugin().apply(compiler);
-      new InternalLoaderPlugin<Plugin.BaseCompilerType<'rspack'>>(this).apply(
-        compiler,
-      );
+    if (this.options.features.loader) {
+      new BuildUtilLoader.ProbeLoaderPlugin().apply(compiler);
+      // add loader page to client
+      this.sdk.addClientRoutes([
+        Manifest.RsdoctorManifestClientRoutes.WebpackLoaders,
+      ]);
+
+      if (!Loader.isVue(compiler)) {
+        new InternalLoaderPlugin<Plugin.BaseCompilerType<'rspack'>>(this).apply(
+          compiler,
+        );
+      }
     }
 
     if (this.options.features.plugins) {
@@ -158,18 +181,34 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
     if (this.outsideInstance && 'parent' in this.sdk) {
       this.sdk.parent.master.setOutputDir(
         path.resolve(
-          compiler.outputPath,
+          this.options.reportDir || compiler.outputPath,
           `./${Constants.RsdoctorOutputFolder}`,
         ),
       );
     }
 
     this.sdk.setOutputDir(
-      path.resolve(compiler.outputPath, `./${Constants.RsdoctorOutputFolder}`),
+      path.resolve(
+        this.options.reportDir || compiler.outputPath,
+        `./${Constants.RsdoctorOutputFolder}`,
+      ),
     );
     await this.sdk.writeStore();
     if (!this.options.disableClientServer) {
-      await this.sdk.server.openClientPage('homepage');
+      if (this.options.mode === SDK.IMode[SDK.IMode.brief]) {
+        const outputFilePath = path.resolve(
+          this.sdk.outputDir,
+          this.options.brief.reportHtmlName || 'rsdoctor-report.html',
+        );
+
+        console.log(
+          `${chalk.green('[RSDOCTOR] generated brief report')}: ${outputFilePath}`,
+        );
+
+        openBrowser(`file:///${outputFilePath}`);
+      } else {
+        await this.sdk.server.openClientPage('homepage');
+      }
     }
 
     if (this.options.disableClientServer) {
@@ -201,7 +240,10 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
     });
 
     this.sdk.setOutputDir(
-      path.resolve(compiler.outputPath, `./${Constants.RsdoctorOutputFolder}`),
+      path.resolve(
+        this.options.reportDir || compiler.outputPath,
+        `./${Constants.RsdoctorOutputFolder}`,
+      ),
     );
   }
 }

@@ -18,6 +18,13 @@ import { EmoCheckData } from '../emo';
 import { Hooks } from './hooks';
 
 export type WriteStoreOptionsType = {};
+
+export enum IMode {
+  brief,
+  lite,
+  normal,
+}
+
 export interface RsdoctorBuilderSDKInstance extends RsdoctorSDKInstance {
   readonly server: RsdoctorServerInstance;
   /** Report configuration information */
@@ -104,7 +111,24 @@ export interface RsdoctorSDKInstance {
   ): Promise<string>;
 }
 
-export type SDKOptionsType = { disableTOSUpload: boolean };
+export interface IPrintLog {
+  serverUrls: boolean;
+}
+
+export interface BriefConfig {
+  reportHtmlName?: string | undefined;
+  writeDataJson: boolean;
+}
+
+export type SDKOptionsType = {
+  disableTOSUpload: boolean;
+  innerClientPath?: string;
+  disableClientServer?: boolean;
+  noServer?: boolean;
+  printLog?: IPrintLog;
+  mode?: keyof typeof IMode;
+  brief?: BriefConfig;
+};
 
 /**
  * @deprecated

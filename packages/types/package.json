@@ -1,6 +1,6 @@
 {
   "name": "@rsdoctor/types",
-  "version": "0.3.7",
+  "version": "0.4.7",
   "repository": {
     "type": "git",
     "url": "https://github.com/web-infra-dev/rsdoctor",
@@ -18,21 +18,21 @@
     "start": "npm run build -- -w"
   },
   "dependencies": {
-    "@types/connect": "3.4.35",
-    "@types/estree": "1.0.0",
-    "@types/tapable": "2.2.2",
-    "@types/webpack": "5.28.0",
+    "@types/connect": "3.4.38",
+    "@types/estree": "1.0.5",
+    "@types/tapable": "2.2.7",
     "source-map": "^0.7.4"
   },
   "devDependencies": {
     "@types/node": "^16",
-    "@types/react": "^18",
-    "tslib": "2.4.1",
+    "@types/react": "^18.3.11",
+    "tslib": "2.7.0",
     "typescript": "^5.2.2",
-    "@rspack/core": "0.7.5"
+    "@rspack/core": "1.0.11"
   },
   "peerDependencies": {
-    "@rspack/core": "0.x"
+    "@rspack/core": "*",
+    "webpack": "5.x"
   },
   "peerDependenciesMeta": {
     "@rspack/core": {

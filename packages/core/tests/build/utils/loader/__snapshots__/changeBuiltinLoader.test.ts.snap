@@ -5,16 +5,28 @@ exports[`test src/build/utils/loader.ts addProbeLoader2Rules > addProbeLoader2Ru
   {
     "test": /\\\\\\.less\\$/,
     "type": "css",
-    "use": "less-loader",
+    "use": [
+      {
+        "loader": "less-loader",
+      },
+    ],
   },
   {
     "test": /\\\\\\.module\\\\\\.less\\$/,
     "type": "css/module",
-    "use": "less-loader",
+    "use": [
+      {
+        "loader": "less-loader",
+      },
+    ],
   },
   {
     "test": /\\\\\\.svg\\$/,
-    "use": "@svgr/webpack",
+    "use": [
+      {
+        "loader": "@svgr/webpack",
+      },
+    ],
   },
   {
     "oneOf": [
@@ -24,22 +36,23 @@ exports[`test src/build/utils/loader.ts addProbeLoader2Rules > addProbeLoader2Ru
         "type": "javascript/auto",
         "use": [
           {
-            "loader": "probe",
+            "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
             "options": {
-              "loader": "builtin:swc-loader",
-              "options": {
-                "jsc": {
-                  "parser": {
-                    "jsx": true,
-                    "syntax": "typescript",
-                  },
+              "builderName": "test-compiler",
+              "ident": undefined,
+              "jsc": {
+                "parser": {
+                  "jsx": true,
+                  "syntax": "typescript",
                 },
-                "sourceMap": true,
               },
+              "loader": "builtin:swc-loader",
+              "sourceMap": true,
               "type": "end",
             },
           },
           {
+            "ident": undefined,
             "loader": "builtin:swc-loader",
             "options": {
               "jsc": {
@@ -52,18 +65,18 @@ exports[`test src/build/utils/loader.ts addProbeLoader2Rules > addProbeLoader2Ru
             },
           },
           {
-            "loader": "probe",
+            "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
             "options": {
-              "loader": "builtin:swc-loader",
-              "options": {
-                "jsc": {
-                  "parser": {
-                    "jsx": true,
-                    "syntax": "typescript",
-                  },
+              "builderName": "test-compiler",
+              "ident": undefined,
+              "jsc": {
+                "parser": {
+                  "jsx": true,
+                  "syntax": "typescript",
                 },
-                "sourceMap": true,
               },
+              "loader": "builtin:swc-loader",
+              "sourceMap": true,
               "type": "start",
             },
           },
@@ -80,22 +93,23 @@ exports[`test src/build/utils/loader.ts addProbeLoader2Rules > addProbeLoader2Ru
         "type": "javascript/auto",
         "use": [
           {
-            "loader": "probe",
+            "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
             "options": {
-              "loader": "builtin:swc-loader",
-              "options": {
-                "jsc": {
-                  "parser": {
-                    "jsx": true,
-                    "syntax": "typescript",
-                  },
+              "builderName": "test-compiler",
+              "ident": undefined,
+              "jsc": {
+                "parser": {
+                  "jsx": true,
+                  "syntax": "typescript",
                 },
-                "sourceMap": true,
               },
+              "loader": "builtin:swc-loader",
+              "sourceMap": true,
               "type": "end",
             },
           },
           {
+            "ident": undefined,
             "loader": "builtin:swc-loader",
             "options": {
               "jsc": {
@@ -108,18 +122,18 @@ exports[`test src/build/utils/loader.ts addProbeLoader2Rules > addProbeLoader2Ru
             },
           },
           {
-            "loader": "probe",
+            "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
             "options": {
-              "loader": "builtin:swc-loader",
-              "options": {
-                "jsc": {
-                  "parser": {
-                    "jsx": true,
-                    "syntax": "typescript",
-                  },
+              "builderName": "test-compiler",
+              "ident": undefined,
+              "jsc": {
+                "parser": {
+                  "jsx": true,
+                  "syntax": "typescript",
                 },
-                "sourceMap": true,
               },
+              "loader": "builtin:swc-loader",
+              "sourceMap": true,
               "type": "start",
             },
           },
@@ -133,19 +147,19 @@ exports[`test src/build/utils/loader.ts addProbeLoader2Rules > addProbeLoader2Ru
     "type": "javascript/auto",
     "use": [
       {
-        "loader": "probe",
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
         "options": {
-          "loader": "builtin:swc-loader",
-          "options": {
-            "jsc": {
-              "externalHelpers": true,
-              "parser": {
-                "syntax": "typescript",
-              },
-              "preserveAllComments": false,
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "jsc": {
+            "externalHelpers": true,
+            "parser": {
+              "syntax": "typescript",
             },
-            "sourceMap": true,
+            "preserveAllComments": false,
           },
+          "loader": "builtin:swc-loader",
+          "sourceMap": true,
           "type": "end",
         },
       },
@@ -163,19 +177,19 @@ exports[`test src/build/utils/loader.ts addProbeLoader2Rules > addProbeLoader2Ru
         },
       },
       {
-        "loader": "probe",
+        "loader": "<ROOT>/packages/core/src/build-utils/build/loader/probeLoader.js",
         "options": {
-          "loader": "builtin:swc-loader",
-          "options": {
-            "jsc": {
-              "externalHelpers": true,
-              "parser": {
-                "syntax": "typescript",
-              },
-              "preserveAllComments": false,
+          "builderName": "test-compiler",
+          "ident": undefined,
+          "jsc": {
+            "externalHelpers": true,
+            "parser": {
+              "syntax": "typescript",
             },
-            "sourceMap": true,
+            "preserveAllComments": false,
           },
+          "loader": "builtin:swc-loader",
+          "sourceMap": true,
           "type": "start",
         },
       },

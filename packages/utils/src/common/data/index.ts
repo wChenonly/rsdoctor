@@ -1,4 +1,4 @@
-import { Rule, SDK, Manifest } from '@rsdoctor/types';
+import { Rule, SDK, Manifest, Constants } from '@rsdoctor/types';
 
 import * as Loader from '../loader';
 import * as Resolver from '../resolver';
@@ -7,7 +7,7 @@ import * as Graph from '../graph';
 import * as Alerts from '../alerts';
 
 /**
- * this class will run at both brower and node environment.
+ * this class will run at both browser and node environment.
  */
 export class APIDataLoader {
   constructor(protected loader: Manifest.ManifestDataLoader) {
@@ -51,6 +51,12 @@ export class APIDataLoader {
             ({ root, pid, hash, summary, configs, envinfo, errors }) as R,
         );
       case SDK.ServerAPI.API.GetClientRoutes:
+        if (
+          typeof window !== 'undefined' &&
+          window?.[Constants.WINDOW_RSDOCTOR_TAG]
+        ) {
+          return window[Constants.WINDOW_RSDOCTOR_TAG].enableRoutes;
+        }
         return this.loader.loadManifest().then((res) => {
           const { enableRoutes = [] } = res.client || {};
           return enableRoutes as R;
@@ -308,7 +314,7 @@ export class APIDataLoader {
           ]) => {
             let outputFilename = '';
 
-            // outputFile is user's repo build config: output.filename. Detial: https://webpack.docschina.org/configuration/output/#outputfilename.
+            // outputFile is user's repo build config: output.filename. Detail: https://webpack.docschina.org/configuration/output/#outputfilename.
             if (typeof configs[0]?.config?.output?.chunkFilename === 'string') {
               outputFilename = configs[0]?.config.output.chunkFilename;
             }

@@ -42,7 +42,7 @@ import {
 } from '../../../utils';
 import { ModuleGraphListContext } from '../config';
 
-let expanedModulesKeys: Key[] = [];
+let expandedModulesKeys: Key[] = [];
 const TAB_MAP = {
   source: 'source code',
   transformed: 'Transformed Code (After compile)',
@@ -53,11 +53,18 @@ const tagStyle = {
   margin: 'none',
   marginInlineEnd: 0,
 };
+const EmptyCodeItem = () => (
+  <Empty
+    description={`Do not have the module code.
+  (1) If you use the brief mode, there will not have any codes to show. 
+  (2) If you use lite mode, there will not have source codes.`}
+  />
+);
 
 export const ModuleCodeViewer: React.FC<{ data: SDK.ModuleData }> = ({
   data,
 }) => {
-  const [tab, setTab] = useState('parsedSource');
+  const [tab, setTab] = useState('');
   const { t } = useI18n();
 
   const TAB_LAB_MAP: Record<string, string> = {
@@ -74,7 +81,11 @@ export const ModuleCodeViewer: React.FC<{ data: SDK.ModuleData }> = ({
       text=""
       buttonProps={{
         size: 'small',
-        icon: <CodepenCircleOutlined />,
+        icon: (
+          <Popover content="Open the Codes Box">
+            <CodepenCircleOutlined />
+          </Popover>
+        ),
         type: 'default',
       }}
       buttonStyle={{ padding: `0 4px` }}
@@ -93,7 +104,7 @@ export const ModuleCodeViewer: React.FC<{ data: SDK.ModuleData }> = ({
               {!source['source'] &&
               !source['parsedSource'] &&
               !source['transformed'] ? (
-                <Empty description="No Code. Rspack builder not support code yet. And if you upload the stats.json to analysis, it's also no code to show." />
+                <EmptyCodeItem />
               ) : (
                 <Card
                   className="code-size-card"
@@ -105,6 +116,9 @@ export const ModuleCodeViewer: React.FC<{ data: SDK.ModuleData }> = ({
                       tab: TAB_LAB_MAP[e.tab],
                       key: e.tab,
                     }))}
+                  defaultActiveTabKey={
+                    source['parsedSource'] ? 'parsedSource' : 'source'
+                  }
                   onTabChange={(v) => setTab(v)}
                   tabBarExtraContent={
                     <Popover
@@ -157,22 +171,33 @@ export const ModuleCodeViewer: React.FC<{ data: SDK.ModuleData }> = ({
                     </Popover>
                   }
                 >
-                  <Editor
-                    theme="vs-dark"
-                    language={getOriginalLanguage(path)}
-                    // eslint-disable-next-line financial/no-float-calculation
-                    height={window.innerHeight / 1.5}
-                    value={source[tab]}
-                    options={{
-                      readOnly: true,
-                      domReadOnly: true,
-                      fontSize: 14,
-                      wordWrap: 'bounded',
-                      minimap: {
-                        enabled: false,
-                      },
-                    }}
-                  />
+                  {source['parsedSource'] ||
+                  source['source'] ||
+                  source['transformed'] ? (
+                    <Editor
+                      theme="vs-dark"
+                      language={getOriginalLanguage(path)}
+                      height={window.innerHeight / 1.5}
+                      value={
+                        tab
+                          ? source[tab]
+                          : source['parsedSource']
+                            ? source['parsedSource']
+                            : source['source']
+                      }
+                      options={{
+                        readOnly: true,
+                        domReadOnly: true,
+                        fontSize: 14,
+                        wordWrap: 'bounded',
+                        minimap: {
+                          enabled: false,
+                        },
+                      }}
+                    />
+                  ) : (
+                    <EmptyCodeItem />
+                  )}
                 </Card>
               )}
             </>
@@ -467,14 +492,16 @@ export const AssetDetail: React.FC<{
                 <Tag color="green">concatenated</Tag>
               </Tooltip>
             ) : null}
-            <Button
-              size="small"
-              icon={<DeploymentUnitOutlined />}
-              onClick={() => {
-                setModuleJumpList([mod.id]);
-                setShow(true);
-              }}
-            />
+            <Popover content="Open the Module Graph Box">
+              <Button
+                size="small"
+                icon={<DeploymentUnitOutlined />}
+                onClick={() => {
+                  setModuleJumpList([mod.id]);
+                  setShow(true);
+                }}
+              />
+            </Popover>
             <ModuleCodeViewer data={mod} />
           </Space>
         );
@@ -486,14 +513,24 @@ export const AssetDetail: React.FC<{
             (e) => includeModules.find((m) => m.path === e)!,
           );
           const parsedSize = sumBy(mods, (e) => e.size?.parsedSize || 0);
+          const sourceSize = sumBy(mods, (e) => e.size?.sourceSize || 0);
           return (
             <Space>
               <Typography.Text>{defaultTitle}</Typography.Text>
               {parsedSize > 0 ? (
-                <Tag style={tagStyle} color={'orange'}>
-                  {'Bundled:' + formatSize(parsedSize)}
+                <>
+                  <Tag style={tagStyle} color={'orange'}>
+                    {'Bundled:' + formatSize(parsedSize)}
+                  </Tag>
+                  <Tag style={tagStyle} color={'lime'}>
+                    {'Source:' + formatSize(sourceSize)}
+                  </Tag>
+                </>
+              ) : (
+                <Tag style={tagStyle} color={'lime'}>
+                  {'Source:' + formatSize(sourceSize)}
                 </Tag>
-              ) : null}
+              )}
             </Space>
           );
         }
@@ -553,14 +590,14 @@ export const AssetDetail: React.FC<{
               {filteredModules.length ? (
                 <FileTree
                   onExpand={(expandedKeys) => {
-                    expanedModulesKeys = expandedKeys;
+                    expandedModulesKeys = expandedKeys;
                   }}
                   treeData={fileStructures}
                   autoExpandParent
                   defaultExpandParent
                   defaultExpandedKeys={
-                    expanedModulesKeys?.length
-                      ? expanedModulesKeys
+                    expandedModulesKeys?.length
+                      ? expandedModulesKeys
                       : fileStructures.length === 1
                         ? [fileStructures[0].key]
                         : []

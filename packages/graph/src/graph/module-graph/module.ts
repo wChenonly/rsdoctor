@@ -180,9 +180,16 @@ export class Module implements SDK.ModuleInstance {
   }
 
   getSource(type: SDK.ToDataType = SDK.ToDataType.Normal) {
+    if (type === SDK.ToDataType.NoCode) {
+      return {
+        source: '',
+        transformed: '',
+        parsedSource: '',
+      };
+    }
     if (
-      type === SDK.ToDataType.Lite ||
-      type === SDK.ToDataType.LiteAndNoAsset
+      type === SDK.ToDataType.NoSourceAndAssets ||
+      type === SDK.ToDataType.NoSource
     ) {
       return {
         source: '',

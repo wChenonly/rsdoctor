@@ -25,7 +25,7 @@ module.exports = {
 
 ### Rsbuild 项目
 
-在 `rsbuild.config.ts` 的 [tools.rspack](https://rsbuild.dev/config/tools/rspack) 中初始化 RsdoctorWebpackPlugin 插件，参考：
+在 `rsbuild.config.ts` 的 [tools.rspack](https://rsbuild.dev/config/tools/rspack) 中初始化 RsdoctorRspackPlugin 插件，参考：
 
 ```js title="rsbuild.config.ts"
 import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
@@ -159,10 +159,6 @@ export default defineConfig({
 ```
 
 - **Options:** 插件提供了一些配置项，请参考 [Options](../../config/options/options)。
-
-#### 📢 Vue 项目使用注意
-
-由于目前不支持对 `vue-loader` 进行分析，对于 Vue 项目，默认情况下禁用了 loader 分析。但是，仍然可以进行插件和构建产物的分析。
 
 ---
 
