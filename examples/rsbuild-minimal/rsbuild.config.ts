@@ -11,8 +11,10 @@ export default defineConfig({
         {
           disableClientServer: !process.env.ENABLE_CLIENT_SERVER,
           features: ['bundle', 'plugins', 'loader', 'resolver'],
-          reportCodeType: {
-            noAssetsAndModuleSource: true,
+          output: {
+            reportCodeType: {
+              noAssetsAndModuleSource: true,
+            },
           },
           linter: {
             level: 'Error',
@@ -24,10 +26,16 @@ export default defineConfig({
                   limit: 1,
                 },
               ],
+              'ecma-version-check': [
+                'Warn',
+                {
+                  ecmaVersion: 3,
+                },
+              ],
             },
           },
           port: 9988,
-          mode: 'brief',
+          // mode: 'brief',
         },
       ]);
     },
@@ -35,5 +43,9 @@ export default defineConfig({
   output: {
     minify: false,
     filenameHash: false,
+    sourceMap: {
+      js: 'cheap-module-source-map',
+      css: true,
+    },
   },
 });

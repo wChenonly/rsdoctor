@@ -1,6 +1,8 @@
 import { Rule } from '@rsdoctor/types';
 import React from 'react';
 
+import type { CheckSyntax } from '@rsbuild/plugin-check-syntax';
+
 export interface AlertProps extends Omit<PackageRelationAlertProps, 'data'> {
   data: Rule.RuleStoreDataItem;
   cwd: string;
@@ -29,10 +31,10 @@ export interface CodeViewAlertProps {
   cwd: string;
 }
 
+type CheckSyntaxError =
+  CheckSyntax['errors'] extends Array<infer T> ? T : false;
 export interface LinkAlertProps {
-  data: Rule.LinkRuleStoreData;
-}
-
-export interface EMOAlertProps {
-  data: Rule.EMORuleStoreData;
+  data: (Rule.RuleStoreDataItem & {
+    error?: CheckSyntaxError;
+  })[];
 }

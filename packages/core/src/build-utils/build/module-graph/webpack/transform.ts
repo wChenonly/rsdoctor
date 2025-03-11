@@ -1,14 +1,12 @@
 import type { SourceMapConsumer } from 'source-map';
 import * as Webpack from 'webpack';
+import * as Rspack from '@rspack/core';
 import { File } from '@rsdoctor/utils/build';
 import { Node } from '@rsdoctor/utils/ruleUtils';
-import { Plugin } from '@rsdoctor/types';
-import { Module, ModuleGraph, PackageData } from '@rsdoctor/graph';
+import { Plugin, SDK } from '@rsdoctor/types';
 import {
   getAllModules,
   getDependencyPosition,
-  getModuleExportsType,
-  getResolveModule,
   getWebpackDependencyRequest,
   getWebpackModuleId,
   getWebpackModulePath,
@@ -55,19 +53,39 @@ async function readFile(target: string, wbFs: WebpackFs) {
   return File.fse.readFile(target).catch(() => {});
 }
 
+/**
+ * Get the type of dependencies between modules.
+ * This property can determine what runtime webpack has added to the modules.
+ */
+export function getModuleExportsType(
+  module: Webpack.NormalModule | Rspack.NormalModule,
+  moduleGraph?: Webpack.ModuleGraph,
+  strict = false,
+): SDK.DependencyBuildMeta['exportsType'] {
+  // webpack 5
+  // https://github.com/webpack/webpack/blob/v5.75.0/lib/RuntimeTemplate.js#L771
+  if (moduleGraph && 'getExportsType' in module) {
+    return module.getExportsType(moduleGraph, strict);
+  }
+  // Rspack does not support `getExportsType` yet.
+  return strict ? 'default-with-named' : 'dynamic';
+}
+
 function appendDependency(
   webpackDep: Webpack.Dependency,
-  module: Module,
+  module: SDK.ModuleInstance,
   webpackGraph: Webpack.ModuleGraph,
-  graph: ModuleGraph,
+  graph: SDK.ModuleGraphInstance,
 ) {
-  const resolvedWebpackModule = getResolveModule(
-    webpackDep,
-    webpackGraph,
-  ) as Webpack.NormalModule;
+  // Rspack does not support `getResolvedModule` yet.
+  const resolvedWebpackModule = webpackGraph?.getResolvedModule
+    ? (webpackGraph.getResolvedModule(webpackDep) as Webpack.NormalModule)
+    : undefined;
+
   if (!resolvedWebpackModule) {
     return;
   }
+
   const rawRequest = getWebpackDependencyRequest(
     webpackDep,
     resolvedWebpackModule,
@@ -142,7 +160,7 @@ function getModuleSource(
 async function appendModuleData(
   origin: Webpack.NormalModule,
   webpackGraph: Webpack.ModuleGraph,
-  graph: ModuleGraph,
+  graph: SDK.ModuleGraphInstance,
   wbFs: WebpackFs,
   features?: Plugin.RsdoctorWebpackPluginFeatures,
   context?: TransformContext,
@@ -193,7 +211,7 @@ async function appendModuleData(
       sourceSize: source.byteLength,
     });
 
-    let packageData: PackageData | undefined;
+    let packageData: SDK.PackageData | undefined;
 
     if (packagePathMap && origin.resourceResolveData) {
       let { descriptionFileRoot: root } = origin.resourceResolveData;
@@ -242,7 +260,7 @@ async function appendModuleData(
 
 export async function appendModuleGraphByCompilation(
   compilation: Plugin.BaseCompilation,
-  graph: ModuleGraph,
+  graph: SDK.ModuleGraphInstance,
   features?: Plugin.RsdoctorWebpackPluginFeatures,
   context?: TransformContext,
 ) {

@@ -150,10 +150,13 @@ export async function reportLoader(
   const loaderData: SDK.LoaderData = [
     {
       resource: {
-        path: ctx.resourcePath,
+        path: ctx._module?.layer
+          ? `${ctx.resourcePath}[${ctx._module.layer}]`
+          : ctx.resourcePath,
         query: parseQuery(ctx.resourceQuery || '?'),
         queryRaw: ctx.resourceQuery,
         ext: path.extname(ctx.resourcePath).slice(1),
+        ...(ctx._module?.layer ? { layer: ctx._module.layer } : {}),
       },
       loaders: [
         {
@@ -200,7 +203,7 @@ export async function reportLoader(
   };
 
   // sdk exists means in the same process
-  const sdk = getSDK();
+  const sdk = getSDK(ctx._compilation?.name);
 
   if (sdk?.reportLoader && !('parent' in sdk && sdk.parent)) {
     sdk.reportLoader(loaderData);

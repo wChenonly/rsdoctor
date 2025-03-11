@@ -20,15 +20,60 @@ export default defineConfig({
     },
   },
   plugins: [appTools()],
+
   tools: {
     bundlerChain: (chain) => {
       chain.plugin(pluginName).use(RsdoctorWebpackPlugin, [
         {
+          linter: {
+            rules: {
+              'loader-performance-optimization': [
+                'Error',
+                {
+                  threshold: 100,
+                },
+              ],
+            },
+          },
           disableClientServer: !process.env.ENABLE_CLIENT_SERVER,
           features: ['bundle', 'plugins', 'loader'],
-          mode: 'brief',
         },
       ]);
+    },
+  },
+  performance: {
+    chunkSplit: {
+      strategy: 'split-by-size',
+      override: {
+        chunks: 'initial',
+        cacheGroups: {
+          myapp: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'myapp-async',
+            reuseExistingChunk: false,
+            filename: 'static/js/myapp/[name].js',
+            minChunks: 1,
+            priority: 10,
+          },
+          myapp2: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'myapp2-async',
+            reuseExistingChunk: false,
+            filename: 'static/js/myapp2/[name].js',
+            minChunks: 1,
+            priority: 10,
+          },
+          default: {
+            minChunks: 5,
+            reuseExistingChunk: true,
+            name: 'common',
+          },
+        },
+      },
+    },
+    bundleAnalyze: {
+      generateStatsFile: true,
+      statsOptions: 'verbose',
     },
   },
 });

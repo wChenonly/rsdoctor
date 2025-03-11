@@ -28,6 +28,8 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
         item.path,
         item.isEntry,
         item.kind,
+        item.renderId,
+        item.layer,
       );
       (module as any).id = item.id;
       module.setSize(item.size);
@@ -228,19 +230,24 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
     return moduleGraph;
   }
 
-  private _dependenciesIdMap: Map<number, Dependency> = new Map();
+  private _dependenciesIdMap: Map<number, SDK.DependencyInstance> = new Map();
 
-  private _moduleWebpackIdMap: Map<string, Module> = new Map();
+  private _moduleWebpackIdMap: Map<string, SDK.ModuleInstance> = new Map();
 
-  private _moduleIdMap: Map<number, Module> = new Map();
+  private _moduleIdMap: Map<number, SDK.ModuleInstance> = new Map();
 
-  private _moduleGraphModules = new Map<Module, ModuleGraphModule>();
+  private _moduleGraphModules = new Map<
+    SDK.ModuleInstance,
+    SDK.ModuleGraphModuleInstance
+  >();
 
-  private _exportIdMap: Map<number, ExportInfo> = new Map();
+  private _exportIdMap: Map<number, SDK.ExportInstance> = new Map();
 
-  private _sideEffectIdMap: Map<number, SideEffect> = new Map();
+  private _sideEffectIdMap: Map<number, SDK.SideEffectInstance> = new Map();
 
-  private _varIdMap: Map<number, Variable> = new Map();
+  private _varIdMap: Map<number, SDK.VariableInstance> = new Map();
+
+  private _layers: Map<string, number> = new Map();
 
   clear() {
     this._dependenciesIdMap = new Map();
@@ -250,6 +257,7 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
     this._exportIdMap = new Map();
     this._sideEffectIdMap = new Map();
     this._varIdMap = new Map();
+    this._layers = new Map();
   }
 
   size() {
@@ -264,11 +272,12 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
     this._exportIdMap = new Map(data._exportIdMap);
     this._sideEffectIdMap = new Map(data._sideEffectIdMap);
     this._varIdMap = new Map(data._varIdMap);
+    this._layers = new Map(data._layers);
   }
 
-  getSubGraphByModule(module: Module): Module[] {
-    const map = new Set<Module>();
-    const result: Module[] = [module];
+  getSubGraphByModule(module: SDK.ModuleInstance): SDK.ModuleInstance[] {
+    const map = new Set<SDK.ModuleInstance>();
+    const result: SDK.ModuleInstance[] = [module];
 
     map.add(module);
 
@@ -319,16 +328,17 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
     return this.getModules().find((item) => item.path === file);
   }
 
-  addModule(...modules: Module[]) {
+  addModule(...modules: SDK.ModuleInstance[]) {
     for (const module of modules) {
       if (!this._moduleIdMap.has(module.id)) {
         this._moduleWebpackIdMap.set(module.webpackId, module);
         this._moduleIdMap.set(module.id, module);
+        module.layer && this.addLayer(module.layer);
       }
     }
   }
 
-  addDependency(...deps: Dependency[]) {
+  addDependency(...deps: SDK.DependencyInstance[]) {
     for (const dep of deps) {
       if (!this._dependenciesIdMap.has(dep.id)) {
         this._dependenciesIdMap.set(dep.id, dep);
@@ -338,7 +348,7 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
     }
   }
 
-  removeModule(module: Module) {
+  removeModule(module: SDK.ModuleInstance) {
     this._moduleIdMap.delete(module.id);
     this._moduleWebpackIdMap.delete(module.webpackId);
 
@@ -352,19 +362,19 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
     }
   }
 
-  removeDependency(dep: Dependency) {
+  removeDependency(dep: SDK.DependencyInstance) {
     dep.module.removeDependency(dep);
     dep.dependency.removeImported(dep.module);
     this._dependenciesIdMap.delete(dep.id);
   }
 
-  addModuleGraphModule(mgm: ModuleGraphModule) {
+  addModuleGraphModule(mgm: SDK.ModuleGraphModuleInstance) {
     if (!this._moduleGraphModules.has(mgm.module)) {
       this._moduleGraphModules.set(mgm.module, mgm);
     }
   }
 
-  getModuleGraphModule(module: Module) {
+  getModuleGraphModule(module: SDK.ModuleInstance) {
     return this._moduleGraphModules.get(module)!;
   }
 
@@ -372,16 +382,26 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
     return Array.from(this._moduleGraphModules.values());
   }
 
-  addExportInfo(data: ExportInfo): void {
+  addExportInfo(data: SDK.ExportInstance): void {
     this._exportIdMap.set(data.id, data);
   }
 
-  addSideEffect(data: SideEffect): void {
+  addSideEffect(data: SDK.SideEffectInstance): void {
     this._sideEffectIdMap.set(data.id, data);
   }
 
-  addVariable(data: Variable): void {
+  addVariable(data: SDK.VariableInstance): void {
     this._varIdMap.set(data.id, data);
+  }
+
+  addLayer(layer: string) {
+    if (!this._layers.get(layer)) {
+      this._layers.set(layer, 1);
+    }
+  }
+
+  getLayers() {
+    return this._layers;
   }
 
   toData(configs?: SDK.ModuleGraphToDataArgs): SDK.ModuleGraphData {
@@ -402,6 +422,7 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
       variables: Array.from(this._varIdMap.values()).map((item) =>
         item.toData(),
       ),
+      layers: Array.from(this._layers.keys()),
     };
   }
 
@@ -411,5 +432,17 @@ export class ModuleGraph implements SDK.ModuleGraphInstance {
       codeMap[item.id] = item.getSource(type);
     });
     return codeMap;
+  }
+
+  setModules(modules: SDK.ModuleInstance[]) {
+    this._moduleIdMap = new Map(modules.map((m) => [m.id, m]));
+    this._moduleWebpackIdMap = new Map(modules.map((m) => [m.webpackId, m]));
+    this._layers = new Map(
+      modules.filter((m) => m.layer).map((m) => [m.layer!, 1]),
+    );
+  }
+
+  setDependencies(dependencies: SDK.DependencyInstance[]) {
+    this._dependenciesIdMap = new Map(dependencies.map((d) => [d.id, d]));
   }
 }

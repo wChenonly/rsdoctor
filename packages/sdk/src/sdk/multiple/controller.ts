@@ -1,8 +1,8 @@
 import { Manifest } from '@rsdoctor/types';
-import { RsdoctorSlaveSDK } from './slave';
+import { RsdoctorPrimarySDK } from './primary';
 
 export class RsdoctorSDKController {
-  readonly slaves: RsdoctorSlaveSDK[] = [];
+  readonly slaves: RsdoctorPrimarySDK[] = [];
 
   public root = '';
 
@@ -42,12 +42,14 @@ export class RsdoctorSDKController {
     name,
     stage,
     extraConfig,
-  }: Omit<ConstructorParameters<typeof RsdoctorSlaveSDK>[0], 'controller'>) {
-    const slave = new RsdoctorSlaveSDK({
+    type,
+  }: Omit<ConstructorParameters<typeof RsdoctorPrimarySDK>[0], 'controller'>) {
+    const slave = new RsdoctorPrimarySDK({
       name,
       stage,
       controller: this,
       extraConfig,
+      type,
     });
     this.slaves.push(slave);
     // sort by stage after create slave sdk.

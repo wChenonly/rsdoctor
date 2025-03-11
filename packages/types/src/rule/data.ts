@@ -1,7 +1,10 @@
-import type { WorkspaceCheckDataType } from '../emo';
 import type { RuleMessage, RuleMessageCodeEnumerated } from './code';
 import type { SourceRange } from '../sdk';
-import type { PackageBasicData } from '../sdk/package';
+import type {
+  CrossChunksPackageType,
+  PackageBasicData,
+  PackageInstance,
+} from '../sdk/package';
 
 export interface BaseRuleStoreData
   extends Pick<RuleMessage, 'code' | 'category'> {
@@ -63,6 +66,14 @@ export interface PackageRelationData {
 export interface PackageRelationDiffRuleStoreData extends BaseRuleStoreData {
   type: 'package-relation';
   packages: PackageRelationData[];
+}
+
+export interface CrossChunksPackageRuleStoreData extends BaseRuleStoreData {
+  type: 'cross-chunks-package';
+  chunks: CrossChunksPackageType[];
+  package: Pick<PackageInstance, 'id' | 'name' | 'version'> & {
+    size: ReturnType<PackageInstance['getSize']>;
+  };
 }
 
 /**
@@ -127,11 +138,6 @@ export interface CodeChangeRuleStoreData extends BaseRuleStoreData {
   };
 }
 
-export interface EMORuleStoreData extends BaseRuleStoreData {
-  type: 'emo';
-  emoCheckData: WorkspaceCheckDataType;
-}
-
 export interface OverlayRuleStoreData extends BaseRuleStoreData {
   code: RuleMessageCodeEnumerated.Overlay;
   stack?: string;
@@ -143,6 +149,6 @@ export type RuleStoreDataItem =
   | CodeChangeRuleStoreData
   | PackageRelationDiffRuleStoreData
   | CodeViewRuleStoreData
-  | EMORuleStoreData;
+  | CrossChunksPackageRuleStoreData;
 
 export type RuleStoreData = RuleStoreDataItem[];

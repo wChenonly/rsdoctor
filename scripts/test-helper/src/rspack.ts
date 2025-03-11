@@ -36,9 +36,32 @@ export function compileByRspack(
   const compiler = rspack({
     entry: absPath,
     mode: 'none',
+    stats: 'normal',
+    cache: false,
+    ...options,
+    optimization: {
+      minimize: false,
+      // concatenateModules: true,
+      ...options.optimization,
+    },
+  });
+
+  // @ts-ignore
+  compiler.outputFileSystem = createFsFromVolume(new Volume());
+
+  return promisifyCompilerRun(compiler);
+}
+
+export function compileByRspackLayers(
+  entry: Configuration['entry'],
+  options: Configuration = {},
+) {
+  const compiler = rspack({
+    entry,
+    mode: 'none',
     output: {
       path: path.resolve(__dirname),
-      filename: 'bundle.js',
+      // filename: 'bundle.js',
     },
     stats: 'normal',
     cache: false,

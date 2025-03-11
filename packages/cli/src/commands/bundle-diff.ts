@@ -1,5 +1,5 @@
 import ora from 'ora';
-import { cyan, red } from 'chalk';
+import { cyan, red } from 'picocolors';
 import { Command } from '../types';
 import {
   enhanceCommand,
@@ -9,7 +9,7 @@ import {
 import { Commands } from '../constants';
 import { Client, Manifest as ManifestType, SDK } from '@rsdoctor/types';
 import { Manifest } from '@rsdoctor/utils/common';
-import { RsdoctorWebpackSDK } from '@rsdoctor/sdk';
+import { RsdoctorSDK } from '@rsdoctor/sdk';
 
 interface Options {
   current: string;
@@ -110,8 +110,8 @@ example: ${bin} ${Commands.BundleDiff} --baseline="x.json" --current="x.json"
 
     spinner.text = `start server`;
 
-    const baselineSdk = new RsdoctorWebpackSDK({ name, root: cwd });
-    const currentSdk = new RsdoctorWebpackSDK({ name, root: cwd });
+    const baselineSdk = new RsdoctorSDK({ name, root: cwd });
+    const currentSdk = new RsdoctorSDK({ name, root: cwd });
 
     await Promise.all([baselineSdk.bootstrap(), currentSdk.bootstrap()]);
 

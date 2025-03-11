@@ -28,7 +28,7 @@ English | [简体中文](./README.zh-CN.md)
  <img src="https://github.com/web-infra-dev/rsdoctor/assets/18437716/4f28312a-68bf-4f9c-91cb-6fd603a37f53" alt="duplicate packages" />
 </div>
 
-## 📚 Getting Started
+## 📚 Getting started
 
 To get started with Rsdoctor, see the [Quick Start](https://rsdoctor.dev/guide/start/quick-start).
 
@@ -36,8 +36,7 @@ To get started with Rsdoctor, see the [Quick Start](https://rsdoctor.dev/guide/s
 
 - **Compilation Visualization**: Rsdoctor visualizes the compilation behavior and time consumption, making it easy to view build issues.
 
-| <img src="https://github.com/web-infra-dev/rsdoctor/assets/18437716/eea845fa-f19f-49d4-9bc6-6795688e6a33" alt="loader timeline" /> | <img src="https://github.com/web-infra-dev/rsdoctor/assets/18437716/172f5328-4508-4f4b-b53b-27ec1095ef9d" alt="loader codes" /> |
-| ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+https://github.com/user-attachments/assets/3400e0a2-a1dc-4a14-9466-6283af9dd9ed
 
 - **Multiple Analysis Capabilities**: Rsdoctor supports build artifact, build-time analysis, and anti-degradation capabilities:
 
@@ -62,12 +61,12 @@ Come and chat with us on [Discord](https://discord.gg/wrBPBT6rkM)! The Rsdoctor 
 ## 🪐 Link
 
 - [Rspack](https://github.com/web-infra-dev/rspack): A fast Rust-based web bundler.
-- [Rsbuild](https://github.com/web-infra-dev/rsbuild): An Rspack-based build tool for the web, rebranded from Modern.js Builder.
-- [Rslib](https://github.com/web-infra-dev/rslib): A library build tool powered by Rsbuild.
-- [Rspress](https://github.com/web-infra-dev/rspress): A fast Rspack-based static site generator.
+- [Rsbuild](https://github.com/web-infra-dev/rsbuild): An Rspack-based build tool.
+- [Rslib](https://github.com/web-infra-dev/rslib): A library development tool powered by Rsbuild.
+- [Rspress](https://github.com/web-infra-dev/rspress): A fast Rsbuild-based static site generator.
 - [Modern.js](https://github.com/web-infra-dev/modern.js): A progressive React framework based on Rsbuild.
 
-## 🙌 Code of Conduct
+## 🙌 Code of conduct
 
 This repo has adopted the ByteDance Open Source Code of Conduct. Please check [Code of Conduct](./CODE_OF_CONDUCT.md) for more details.
 

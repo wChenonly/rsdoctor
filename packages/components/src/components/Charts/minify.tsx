@@ -1,4 +1,3 @@
-import { BarChartOutlined } from '@ant-design/icons';
 import { SDK } from '@rsdoctor/types';
 import { Divider, Space } from 'antd';
 import React from 'react';
@@ -7,26 +6,31 @@ import { Summary } from '@rsdoctor/utils/common';
 import { Card } from '../Card';
 import { ServerAPIProvider } from '../Manifest';
 import { WebpackPluginsDataTable } from '../Plugins/webpack';
-import { CommonChartProps, CommonExecutionEmptyTips, CommonExecutionsChart } from './common';
+import {
+  CommonChartProps,
+  CommonExecutionEmptyTips,
+  CommonExecutionsChart,
+} from './common';
+import { ChartTypes } from './constants';
 
 import './loader.scss';
 import './tooltips.scss';
 
-export const MinifyChartContainer: React.FC<CommonChartProps> = ({ summary }) => {
+export const MinifyChartContainer: React.FC<CommonChartProps> = ({
+  summary,
+}) => {
   const hooks: Array<string> = ['processAssets', 'optimizeChunkAssets'];
   const { costs = [] } = summary || {};
-  const target = costs.find((e) => e.name === Summary.SummaryCostsDataName.Minify);
+  const target = costs.find(
+    (e) => e.name === Summary.SummaryCostsDataName.Minify,
+  );
 
   if (!target) return null;
   return (
     <TextDrawer
+      containerProps={{ style: { display: 'inline' } }}
       drawerProps={{ title: 'Details of the "Minify" stage' }}
-      text={
-        <Space>
-          detail
-          <BarChartOutlined />
-        </Space>
-      }
+      text={<Space>detail</Space>}
     >
       <ServerAPIProvider api={SDK.ServerAPI.API.GetPluginData} body={{ hooks }}>
         {(res) =>
@@ -37,7 +41,7 @@ export const MinifyChartContainer: React.FC<CommonChartProps> = ({ summary }) =>
               </Card>
               <Divider />
               <Card title='Chart of the "Minify"'>
-                <CommonExecutionsChart plugins={res} />
+                <CommonExecutionsChart plugins={res} type={ChartTypes.Minify} />
               </Card>
             </Space>
           ) : (

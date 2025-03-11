@@ -5,6 +5,7 @@ import * as Resolver from '../resolver';
 import * as Plugin from '../plugin';
 import * as Graph from '../graph';
 import * as Alerts from '../alerts';
+import { relative } from 'path';
 
 /**
  * this class will run at both browser and node environment.
@@ -66,6 +67,12 @@ export class APIDataLoader {
       case SDK.ServerAPI.API.GetLoaderNames:
         return this.loader.loadData('loader').then((res) => {
           return Loader.getLoaderNames(res || []) as R;
+        });
+
+      case SDK.ServerAPI.API.GetLayers:
+        return this.loader.loadData('moduleGraph').then((res) => {
+          const { layers } = res || {};
+          return layers as R;
         });
 
       case SDK.ServerAPI.API.GetLoaderChartData:
@@ -230,7 +237,9 @@ export class APIDataLoader {
           const _moduleCodeData = {} as R;
           if (moduleCodeMap) {
             moduleIds.forEach((id: number) => {
-              _moduleCodeData[id] = moduleCodeMap[id] as R;
+              (_moduleCodeData as Record<string, R>)[id] = moduleCodeMap[
+                id
+              ] as R;
             });
             return _moduleCodeData as R;
           }
@@ -240,6 +249,76 @@ export class APIDataLoader {
       case SDK.ServerAPI.API.GetAllModuleGraph:
         return this.loader.loadData('moduleGraph').then((moduleGraph) => {
           return moduleGraph?.modules as R;
+        });
+
+      case SDK.ServerAPI.API.GetSearchModules:
+        return Promise.all([
+          this.loader.loadData('moduleGraph'),
+          this.loader.loadData('chunkGraph'),
+        ]).then((res) => {
+          const [moduleGraph, chunkGraph] = res as [
+            SDK.ModuleGraphData,
+            SDK.ChunkGraphData,
+          ];
+          const { moduleName } =
+            body as SDK.ServerAPI.InferRequestBodyType<SDK.ServerAPI.API.GetSearchModules>;
+          if (!moduleName) return [] as R;
+
+          const assetMap = chunkGraph.chunks.reduce(
+            (acc, chunk) => {
+              chunk.assets.forEach((asset) => {
+                if (!acc[chunk.id]) {
+                  acc[chunk.id] = [];
+                }
+                acc[chunk.id].push(asset);
+              });
+              return acc;
+            },
+            {} as Record<string, string[]>,
+          );
+
+          const searchedChunksMap = new Map();
+          moduleGraph?.modules.filter((module) => {
+            if (module.webpackId.includes(moduleName)) {
+              module.chunks.forEach((chunk) => {
+                if (searchedChunksMap.has(chunk)) {
+                  return;
+                }
+                const assets = assetMap[chunk] || [];
+                assets.forEach((asset) => {
+                  if (asset.endsWith('.js')) {
+                    searchedChunksMap.set(chunk, asset);
+                  }
+                });
+              });
+            }
+          });
+          return Object.fromEntries(searchedChunksMap) as R;
+        });
+
+      case SDK.ServerAPI.API.GetSearchModuleInChunk:
+        return Promise.all([
+          this.loader.loadData('moduleGraph'),
+          this.loader.loadData('root'),
+        ]).then((res) => {
+          const [moduleGraph, root] = res as [SDK.ModuleGraphData, string];
+          const { moduleName, chunk } =
+            body as SDK.ServerAPI.InferRequestBodyType<SDK.ServerAPI.API.GetSearchModuleInChunk>;
+          if (!moduleName) return [] as R;
+
+          const filteredModules = moduleGraph?.modules
+            .filter(
+              (module) =>
+                module.webpackId.includes(moduleName) &&
+                module.chunks.includes(chunk),
+            )
+            .map((filteredModule) => ({
+              id: filteredModule.id,
+              path: filteredModule.path,
+              relativePath: relative(root, filteredModule.path),
+            }));
+
+          return filteredModules as R;
         });
 
       case SDK.ServerAPI.API.GetAllChunkGraph:

@@ -1,11 +1,10 @@
 import { SDK } from '@rsdoctor/types';
 import path from 'path';
-import { isNumber } from 'lodash';
+import { Lodash } from '@rsdoctor/utils/common';
 import type { SourceMapConsumer } from 'source-map';
 import type { Program } from 'estree';
 import { Dependency } from './dependency';
 import { Statement } from './statement';
-import { Chunk } from '../chunk-graph';
 import { getModuleName } from './utils';
 
 let id = 1;
@@ -17,7 +16,9 @@ export class Module implements SDK.ModuleInstance {
     id = 1;
   }
 
-  readonly id: number;
+  id: number;
+
+  renderId: string | undefined;
 
   readonly webpackId: string;
 
@@ -26,6 +27,8 @@ export class Module implements SDK.ModuleInstance {
   readonly isEntry: boolean;
 
   readonly kind: SDK.ModuleKind;
+
+  readonly layer?: string;
 
   private source: SDK.ModuleSource = {
     source: '',
@@ -43,15 +46,15 @@ export class Module implements SDK.ModuleInstance {
 
   private program: Program | undefined;
 
-  private chunks: Chunk[] = [];
+  private chunks: SDK.ChunkInstance[] = [];
 
-  private dependencies: Dependency[] = [];
+  private dependencies: SDK.DependencyInstance[] = [];
 
-  private imported: Module[] = [];
+  private imported: SDK.ModuleInstance[] = [];
 
-  private modules: Module[] = [];
+  private modules: SDK.ModuleInstance[] = [];
 
-  private concatenationModules: Module[] = [];
+  private concatenationModules: SDK.ModuleInstance[] = [];
 
   private _isPreferSource?: boolean;
 
@@ -65,15 +68,19 @@ export class Module implements SDK.ModuleInstance {
     path: string,
     isEntry = false,
     kind = SDK.ModuleKind.Normal,
+    renderId: string | undefined = undefined,
+    layer = '',
   ) {
     this.id = id++;
     this.webpackId = webpackId;
     this.path = path;
     this.isEntry = isEntry;
     this.kind = kind;
+    this.renderId = renderId;
+    this.layer = layer;
   }
 
-  get rootModule(): Module | undefined {
+  get rootModule(): SDK.ModuleInstance | undefined {
     return this.modules.find((item) => item.path === this.path);
   }
 
@@ -90,30 +97,32 @@ export class Module implements SDK.ModuleInstance {
     return result;
   }
 
-  getChunks(): Chunk[] {
+  getChunks(): SDK.ChunkInstance[] {
     return this.chunks.slice();
   }
 
-  addChunk(chunk: Chunk): void {
+  addChunk(chunk: SDK.ChunkInstance): void {
     if (!this.chunks.includes(chunk)) {
       this.chunks.push(chunk);
       chunk.addModule(this);
     }
   }
 
-  removeChunk(chunk: Chunk): void {
+  removeChunk(chunk: SDK.ChunkInstance): void {
     this.chunks = this.chunks.filter((item) => item !== chunk);
   }
 
-  getDependencies(): Dependency[] {
+  getDependencies(): SDK.DependencyInstance[] {
     return this.dependencies.slice();
   }
 
-  getDependencyByRequest(request: string): Dependency | undefined {
+  getDependencyByRequest(request: string): SDK.DependencyInstance | undefined {
     return this.dependencies.find((item) => item.request === request);
   }
 
-  getDependencyByModule(module: Module): Dependency | undefined {
+  getDependencyByModule(
+    module: SDK.ModuleInstance,
+  ): SDK.DependencyInstance | undefined {
     return this.dependencies.find(
       (item) => item.originDependency === module || item.dependency === module,
     );
@@ -121,9 +130,9 @@ export class Module implements SDK.ModuleInstance {
 
   addDependency(
     request: string,
-    module: Module,
+    module: SDK.ModuleInstance,
     kind: SDK.DependencyKind,
-    statements?: Statement[],
+    statements?: SDK.StatementInstance[],
   ) {
     const dep = new Dependency(request, this, module, kind, statements);
 
@@ -139,28 +148,28 @@ export class Module implements SDK.ModuleInstance {
     }
   }
 
-  removeDependency(dep: Dependency): void {
+  removeDependency(dep: SDK.DependencyInstance): void {
     this.dependencies = this.dependencies.filter((item) => item === dep);
   }
 
-  removeDependencyByModule(module: Module): void {
+  removeDependencyByModule(module: SDK.ModuleInstance): void {
     const dep = this.getDependencyByModule(module);
     if (dep) {
       this.removeDependency(dep);
     }
   }
 
-  getImported(): Module[] {
+  getImported(): SDK.ModuleInstance[] {
     return this.imported.slice();
   }
 
-  addImported(module: Module): void {
+  addImported(module: SDK.ModuleInstance): void {
     if (!this.imported.includes(module)) {
       this.imported.push(module);
     }
   }
 
-  removeImported(module: Module): void {
+  removeImported(module: SDK.ModuleInstance): void {
     this.imported = this.imported.filter((item) => item === module);
   }
 
@@ -259,7 +268,7 @@ export class Module implements SDK.ModuleInstance {
       bias: 1,
     });
 
-    if (isNumber(startInSource.line)) {
+    if (Lodash.isNumber(startInSource.line)) {
       source.start = {
         line: startInSource.line,
         column: startInSource.column ?? undefined,
@@ -274,7 +283,7 @@ export class Module implements SDK.ModuleInstance {
         // bias: 2,
       });
 
-      if (isNumber(endInSource.line)) {
+      if (Lodash.isNumber(endInSource.line)) {
         source.end = {
           line: endInSource.line,
           column: endInSource.column ?? undefined,
@@ -285,7 +294,7 @@ export class Module implements SDK.ModuleInstance {
     return source;
   }
 
-  addNormalModule(module: Module): void {
+  addNormalModule(module: SDK.ModuleInstance): void {
     if (!this.modules.includes(module)) {
       this.modules.push(module);
       module.addConcatenationModule(this);
@@ -296,13 +305,13 @@ export class Module implements SDK.ModuleInstance {
     return this.modules.slice();
   }
 
-  addConcatenationModule(module: Module): void {
+  addConcatenationModule(module: SDK.ModuleInstance): void {
     if (!this.concatenationModules.includes(module)) {
       this.concatenationModules.push(module);
     }
   }
 
-  getConcatenationModules(): Module[] {
+  getConcatenationModules(): SDK.ModuleInstance[] {
     return this.concatenationModules.slice();
   }
 
@@ -311,6 +320,7 @@ export class Module implements SDK.ModuleInstance {
     const moduleName = getModuleName(this.webpackId);
     const data: SDK.ModuleData = {
       id: this.id,
+      renderId: this.renderId,
       webpackId:
         contextPath && moduleName.indexOf('.') > 0
           ? path.relative(contextPath, moduleName)
@@ -322,6 +332,7 @@ export class Module implements SDK.ModuleInstance {
       chunks: this.chunks.map((item) => item.id),
       size: this.getSize(),
       kind: this.kind,
+      ...(this.layer ? { layer: this.layer } : {}),
     };
 
     if (this.meta.hasSetEsModuleStatement || this.meta.strictHarmonyModule) {
@@ -355,5 +366,33 @@ export class Module implements SDK.ModuleInstance {
     }
 
     return data;
+  }
+
+  setId(id: number) {
+    this.id = id;
+  }
+
+  setRenderId(renderId: string) {
+    this.renderId = renderId;
+  }
+
+  setChunks(chunks: SDK.ChunkInstance[]): void {
+    this.chunks = chunks;
+  }
+
+  setDependencies(dependencies: SDK.DependencyInstance[]): void {
+    this.dependencies = dependencies;
+  }
+
+  setImported(imported: SDK.ModuleInstance[]): void {
+    this.imported = imported;
+  }
+
+  setModules(modules: SDK.ModuleInstance[]): void {
+    this.modules = modules;
+  }
+
+  setConcatenationModules(modules: SDK.ModuleInstance[]): void {
+    this.concatenationModules = modules;
   }
 }

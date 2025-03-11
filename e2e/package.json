@@ -3,35 +3,29 @@
   "name": "@rsdoctor/e2e",
   "version": "0.0.1",
   "scripts": {
-    "test": "pnpm run i:webkit && playwright test",
-    "i:webkit": "playwright install-deps"
+    "test": "playwright test",
+    "test:native": "RSPACK_NATIVE_PLUGIN=true playwright test",
+    "test:local": "npx playwright install chromium && playwright test"
   },
   "dependencies": {
-    "devcert": "1.2.2",
-    "lodash": "^4.17.21",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.17.0",
-    "vue": "^3.5.12"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "webpack": "^5.95.0",
-    "@playwright/test": "1.33.0",
+    "@playwright/test": "1.44.1",
+    "@rsdoctor/cli": "workspace:*",
     "@rsdoctor/core": "workspace:*",
     "@rsdoctor/rspack-plugin": "workspace:*",
     "@rsdoctor/sdk": "workspace:*",
     "@rsdoctor/types": "workspace:*",
     "@rsdoctor/utils": "workspace:*",
     "@rsdoctor/webpack-plugin": "workspace:*",
-    "@rsdoctor/cli": "workspace:*",
-    "@rspack/core": "1.0.0",
-    "@types/lodash": "^4.17.10",
+    "@rspack/core": "^1.2.7",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^16",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.1",
-    "fast-glob": "^3.3.2",
+    "@types/react": "^18.3.18",
     "loader-utils": "^2.0.4",
-    "playwright": "1.33.0",
-    "typescript": "^5.2.2"
+    "playwright": "1.44.1",
+    "typescript": "^5.2.2",
+    "webpack": "^5.97.1"
   }
 }

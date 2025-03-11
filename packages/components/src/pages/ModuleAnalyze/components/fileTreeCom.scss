@@ -33,13 +33,12 @@ $treeNodePrefixCls: '#{$treePrefixCls}-treenode';
     }
   }
 
-  &-treenode-disabled 
-    > span:not(.#{$treePrefixCls}-switcher),
-    > a,
-    > a span {
-      color: #767676;
-      cursor: not-allowed;
-    }
+  &-treenode-disabled > span:not(.#{$treePrefixCls}-switcher),
+  > a,
+  > a span {
+    color: #767676;
+    cursor: not-allowed;
+  }
 
   &-treenode-selected {
     background: rgba(5, 145, 255, 0.3);
@@ -49,6 +48,23 @@ $treeNodePrefixCls: '#{$treePrefixCls}-treenode';
   &-title {
     display: inline-block;
     cursor: pointer;
+  }
+
+  &-titles-box:hover {
+    background-color: #f0f3f5;
+    border: 1px solid #e5e6eb;
+    cursor: pointer;
+    width: 80%;
+
+    .ant-typography:hover {
+      color: #0079ff;
+    }
+  }
+
+  &-node-title {
+    .file-icon {
+      padding: 4px 0 0 0;
+    }
   }
 
   &-indent {
@@ -66,7 +82,6 @@ $treeNodePrefixCls: '#{$treePrefixCls}-treenode';
   transform: rotate(0deg);
   transition: transform 0.3s ease;
 
-
   &-expand {
     transform: rotate(90deg);
   }
@@ -75,21 +90,23 @@ $treeNodePrefixCls: '#{$treePrefixCls}-treenode';
 .rc-tree.rc-tree-show-line .rc-tree-treenode:not(:last-child) {
   border-left: 1px solid #eee;
 
-.#{$treePrefixCls}-titles {
-  display: flex;
-  flex-direction: column;
-
-  .#{$treePrefixCls}-node-title {
+  .#{$treePrefixCls}-titles {
     display: flex;
-    cursor: pointer;
-    img {
+    flex-direction: column;
+
+    .#{$treePrefixCls}-node-title {
+      display: flex;
       cursor: pointer;
-    &-tag {
-      cursor: pointer;
+      line-height: 30px;
+
+      img {
+        cursor: pointer;
+        &-tag {
+          cursor: pointer;
+        }
+      }
     }
   }
-  }
-} 
 
   .#{$treePrefixCls}-node-title-selected {
     background-color: yellow;

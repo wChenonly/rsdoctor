@@ -6,6 +6,7 @@ import { WebpackConfigurationViewer } from '../../components/Configuration';
 import { ServerAPIProvider } from '../../components/Manifest';
 import { WebpackPluginsDataTable } from '../../components/Plugins/webpack';
 import { Size } from '../../constants';
+import './index.scss';
 
 export const Page: React.FC = () => {
   const [selectedTapNames, setSelectedTapNames] = useState([]);
@@ -14,11 +15,14 @@ export const Page: React.FC = () => {
   return (
     <div>
       <Card
-        title="Webpack Plugins Overall"
+        title="Plugins Overall"
         bodyStyle={{ paddingTop: Size.BasePadding / 3 }}
         extra={<WebpackConfigurationViewer defaultKeys={['plugins']} />}
       >
-        <Space direction="vertical">
+        <Space
+          direction="vertical"
+          style={{ width: '100%', padding: '0 30px' }}
+        >
           <ServerAPIProvider api={SDK.ServerAPI.API.GetPluginSummary}>
             {({ hooks, tapNames }) => (
               <Space style={{ marginBottom: Size.BasePadding / 2 }}>
@@ -30,8 +34,9 @@ export const Page: React.FC = () => {
                   <Select
                     mode="multiple"
                     allowClear
-                    style={{ width: 350 }}
-                    dropdownMatchSelectWidth
+                    className="plugin-select"
+                    style={{ width: 300 }}
+                    popupMatchSelectWidth
                     onChange={(e) => {
                       setSelectedTapNames(e);
                     }}
@@ -53,8 +58,9 @@ export const Page: React.FC = () => {
                   <Select
                     mode="multiple"
                     allowClear
-                    style={{ width: 350 }}
-                    dropdownMatchSelectWidth
+                    className="plugin-select"
+                    style={{ width: 300 }}
+                    popupMatchSelectWidth
                     onChange={(e) => {
                       setSelectedHooks(e);
                     }}
@@ -83,4 +89,4 @@ export const Page: React.FC = () => {
   );
 };
 
-export * from './constants'
+export * from './constants';

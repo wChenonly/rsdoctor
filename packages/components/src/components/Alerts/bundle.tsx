@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Rule, SDK } from '@rsdoctor/types';
-import { hasViewModeFromStorage, useBundleAlertsByErrors, useViewMode } from '../../utils';
-import { CommonAlertsContainer } from './common';
+import { hasViewModeFromStorage, useViewMode, useI18n } from '../../utils';
+import { BundleAlert } from './bundle-alert';
 import { withServerAPI } from '../Manifest';
 import { ViewMode } from '../../constants';
 import { PackageRelationReasonsWithServer } from '../Alert/package-relation';
@@ -12,10 +12,14 @@ interface BundleAlertsProps {
   project: SDK.ServerAPI.InferResponseType<SDK.ServerAPI.API.GetProjectInfo>;
 }
 
-export const BundleAlertsBase: React.FC<BundleAlertsProps> = ({ filter, project }) => {
+export const BundleAlertsBase: React.FC<BundleAlertsProps> = ({
+  filter,
+  project,
+}) => {
   const { errors, root: cwd } = project;
-  const bundleAlerts = useBundleAlertsByErrors(errors);
+  const bundleAlerts = errors;
   const { setBundleAlertsViewMode, viewMode, setViewMode } = useViewMode();
+  const { t } = useI18n();
 
   const dataSource = filter ? bundleAlerts.filter(filter) : bundleAlerts;
 
@@ -23,7 +27,8 @@ export const BundleAlertsBase: React.FC<BundleAlertsProps> = ({ filter, project 
     if (!hasViewModeFromStorage()) {
       setViewMode(
         {
-          bundleAlerts: bundleAlerts.length >= 5 ? ViewMode.Group : ViewMode.List,
+          bundleAlerts:
+            bundleAlerts.length >= 5 ? ViewMode.Group : ViewMode.List,
         },
         false,
       );
@@ -37,17 +42,24 @@ export const BundleAlertsBase: React.FC<BundleAlertsProps> = ({ filter, project 
           Alert: {
             colorInfoBg: '#e6f4ff57',
             colorInfoBorder: 'none',
-          }
-        }
+          },
+        },
+        token: {
+          padding: 16,
+          colorText: 'rgba(0, 0, 0, 0.85)',
+        },
       }}
     >
-      <CommonAlertsContainer
-        title="Bundle Alerts"
+      <BundleAlert
+        title={t('Bundle Alerts')}
         dataSource={dataSource}
         extraData={{
           cwd,
           getPackageRelationContentComponent: (res) => (
-            <PackageRelationReasonsWithServer body={{ id: res.data.id, target: res.package.target }} cwd={cwd} />
+            <PackageRelationReasonsWithServer
+              body={{ id: res.data.id, target: res.package.target }}
+              cwd={cwd}
+            />
           ),
         }}
         viewMode={viewMode.bundleAlerts}

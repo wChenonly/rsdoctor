@@ -1,27 +1,22 @@
 import type { Configuration, RuleSetRule } from '@rspack/core';
-import { ModuleGraph } from '@rsdoctor/graph';
-import {
-  openBrowser,
-  RsdoctorSlaveSDK,
-  RsdoctorWebpackSDK,
-} from '@rsdoctor/sdk';
+import { openBrowser, RsdoctorPrimarySDK, RsdoctorSDK } from '@rsdoctor/sdk';
 import {
   InternalLoaderPlugin,
   InternalPluginsPlugin,
   InternalSummaryPlugin,
   makeRulesSerializable,
-  normalizeUserConfig,
   setSDK,
   ensureModulesChunksGraphFn,
   InternalBundlePlugin,
   InternalRulesPlugin,
   InternalErrorReporterPlugin,
   InternalBundleTagPlugin,
+  normalizeRspackUserOptions,
 } from '@rsdoctor/core/plugins';
 import type {
   RsdoctorRspackPluginInstance,
-  RsdoctorPluginOptionsNormalized,
   RsdoctorRspackPluginOptions,
+  RsdoctorRspackPluginOptionsNormalized,
 } from '@rsdoctor/core';
 import { Loader as BuildUtilLoader } from '@rsdoctor/core/build-utils';
 import {
@@ -37,14 +32,15 @@ import { pluginTapName, pluginTapPostOptions } from './constants';
 import { cloneDeep } from 'lodash';
 
 import { Loader } from '@rsdoctor/utils/common';
-import { chalk } from '@rsdoctor/utils/logger';
+import { chalk, logger } from '@rsdoctor/utils/logger';
+import { ModuleGraph } from '@rsdoctor/graph';
 
 export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
   implements RsdoctorRspackPluginInstance<Rules>
 {
   public readonly name = pluginTapName;
 
-  public readonly sdk: RsdoctorWebpackSDK | RsdoctorSlaveSDK;
+  public readonly sdk: RsdoctorSDK | RsdoctorPrimarySDK;
 
   public readonly isRsdoctorPlugin: boolean;
 
@@ -52,14 +48,14 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
 
   protected browserIsOpened = false;
 
-  public modulesGraph: ModuleGraph;
+  public modulesGraph: SDK.ModuleGraphInstance;
 
-  public options: RsdoctorPluginOptionsNormalized<Rules>;
+  public options: RsdoctorRspackPluginOptionsNormalized<Rules>;
 
   public outsideInstance: boolean;
 
   constructor(options?: RsdoctorRspackPluginOptions<Rules>) {
-    this.options = normalizeUserConfig<Rules>(
+    this.options = normalizeRspackUserOptions<Rules>(
       Object.assign(options || {}, {
         supports: {
           ...options?.supports,
@@ -72,17 +68,18 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
     );
     this.sdk =
       this.options.sdkInstance ??
-      new RsdoctorWebpackSDK({
+      new RsdoctorSDK({
         port: this.options.port,
         name: pluginTapName,
         root: process.cwd(),
-        type: this.options.reportCodeType,
+        type: this.options.output.reportCodeType,
         config: {
           disableTOSUpload: this.options.disableTOSUpload,
           innerClientPath: this.options.innerClientPath,
           printLog: this.options.printLog,
           mode: this.options.mode ? this.options.mode : undefined,
           brief: this.options.brief,
+          compressData: this.options.output.compressData,
         },
       });
     this.outsideInstance = Boolean(this.options.sdkInstance);
@@ -106,6 +103,10 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
 
     setSDK(this.sdk);
 
+    compiler.hooks.afterPlugins.tap(
+      pluginTapPostOptions,
+      this.afterPlugins.bind(this, compiler),
+    );
     compiler.hooks.done.tapPromise(
       {
         ...pluginTapPostOptions,
@@ -149,10 +150,33 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
       ).apply(compiler);
     }
 
+    if (this.options.features.resolver) {
+      logger.info(
+        chalk.yellow(
+          'Rspack currently does not support Resolver capabilities.',
+        ),
+      );
+    }
+
     new InternalRulesPlugin(this).apply(compiler);
 
     // InternalErrorReporterPlugin must called before InternalRulesPlugin, to avoid treat Rsdoctor's lint warnings/errors as Webpack's warnings/errors.
     new InternalErrorReporterPlugin(this).apply(compiler);
+
+    // apply Rspack native plugin to improve the performance
+    const RsdoctorRspackNativePlugin =
+      compiler.webpack.experiments?.RsdoctorPlugin;
+    if (
+      this.options.experiments?.enableNativePlugin &&
+      RsdoctorRspackNativePlugin
+    ) {
+      logger.debug('[RspackNativePlugin] Enabled');
+      new RsdoctorRspackNativePlugin({
+        // TODO: more detailed data features based on the rsdoctor options
+        moduleGraphFeatures: true,
+        chunkGraphFeatures: true,
+      }).apply(compiler);
+    }
   }
 
   /**
@@ -167,11 +191,13 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
     ensureModulesChunksGraphFn(compiler, this);
   }
 
+  public afterPlugins = (compiler: Plugin.BaseCompilerType<'rspack'>): void => {
+    this.getRspackConfig(compiler);
+  };
+
   public done = async (
     compiler: Plugin.BaseCompilerType<'rspack'>,
   ): Promise<void> => {
-    this.getRspackConfig(compiler);
-
     await this.sdk.bootstrap();
 
     this.sdk.addClientRoutes([
@@ -181,7 +207,7 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
     if (this.outsideInstance && 'parent' in this.sdk) {
       this.sdk.parent.master.setOutputDir(
         path.resolve(
-          this.options.reportDir || compiler.outputPath,
+          this.options.output.reportDir || compiler.outputPath,
           `./${Constants.RsdoctorOutputFolder}`,
         ),
       );
@@ -189,7 +215,7 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
 
     this.sdk.setOutputDir(
       path.resolve(
-        this.options.reportDir || compiler.outputPath,
+        this.options.output.reportDir || compiler.outputPath,
         `./${Constants.RsdoctorOutputFolder}`,
       ),
     );
@@ -241,7 +267,7 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
 
     this.sdk.setOutputDir(
       path.resolve(
-        this.options.reportDir || compiler.outputPath,
+        this.options.output.reportDir || compiler.outputPath,
         `./${Constants.RsdoctorOutputFolder}`,
       ),
     );

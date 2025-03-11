@@ -62,14 +62,13 @@ export default defineConfig({
   ],
   root: path.join(__dirname, 'docs'),
   title: 'Rsdoctor',
-  description: 'A one-stop build analyzer for Rspack and Webpack.',
+  description: 'A one-stop build analyzer for Rspack and webpack.',
   icon: 'https://assets.rspack.dev/rsdoctor/rsdoctor-logo-960x960.png',
   lang: 'en',
   base: '/',
   logo: {
-    light:
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/logo/rsdoctor-logo-light.png',
-    dark: 'https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/logo/rsdoctor-logo-dark.png',
+    light: 'https://assets.rspack.dev/rsdoctor/rsdoctor-logo-light.png',
+    dark: 'https://assets.rspack.dev/rsdoctor/rsdoctor-logo-dark.png',
   },
   head: [
     '<meta name="apple-mobile-web-app-capable" content="yes" />',
@@ -80,6 +79,9 @@ export default defineConfig({
   },
   ssg: {
     strict: true,
+  },
+  search: {
+    codeBlocks: true,
   },
   route: {
     cleanUrls: true,
@@ -113,13 +115,13 @@ export default defineConfig({
         lang: 'en',
         label: 'English',
         title: 'Rsdoctor',
-        description: 'Build analyzer for Rspack and Webpack',
+        description: 'Build analyzer for Rspack and webpack',
       },
       {
         lang: 'zh',
         label: '简体中文',
         title: 'Rsdoctor',
-        description: 'Rspack 和 Webpack 项目的构建分析工具',
+        description: 'Rspack 和 webpack 项目的构建分析工具',
       },
     ],
   },
@@ -131,7 +133,7 @@ export default defineConfig({
         type: 'website',
         url: 'https://rsdoctor.dev/',
         image: 'https://rsdoctor.dev/og-image.png',
-        description: 'Build analyzer for Rspack and Webpack',
+        description: 'Build analyzer for Rspack and webpack',
         twitter: {
           site: '@rspack_dev',
           card: 'summary_large_image',

@@ -11,7 +11,7 @@ import { PluginAPIResponse, PluginAPIRequestBody } from './plugin';
 import { GraphAPIResponse, GraphAPIRequestBody } from './graph';
 import { AlertsAPIResponse, AlertsAPIRequestBody } from './alerts';
 import { RsdoctorManifestMappingKeys } from '../../../manifest';
-import { SDK } from '@/index';
+import { SDK } from '../../../index';
 
 export * from './pagination';
 
@@ -61,6 +61,9 @@ export enum API {
   GetModuleCodeByModuleIds = '/api/graph/module/codes',
   GetAllModuleGraph = '/api/graph/module/all',
   GetAllChunkGraph = '/api/graph/chunk/all',
+  GetLayers = '/api/graph/layers',
+  GetSearchModules = '/api/search/modules',
+  GetSearchModuleInChunk = '/api/search/chunk/modules',
 
   /** Alerts API */
   GetPackageRelationAlertDetails = '/api/alerts/details/package/relation',
@@ -120,8 +123,14 @@ export interface ResponseTypes
   };
   [API.GetModuleCodeByModuleId]: SDK.ModuleSource;
   [API.GetModuleCodeByModuleIds]: SDK.ModuleCodeData;
-  [API.GetAllModuleGraph]: SDK.ModuleGraphData;
-  [API.GetAllChunkGraph]: SDK.ChunkGraphData;
+  [API.GetAllModuleGraph]: SDK.ModuleData[];
+  [API.GetSearchModules]: Record<string, string>;
+  [API.GetSearchModuleInChunk]: {
+    id: string;
+    path: string;
+    relativePath: string;
+  }[];
+  [API.GetAllChunkGraph]: SDK.ChunkData[];
 }
 
 export interface RequestBodyTypes

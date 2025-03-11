@@ -1,5 +1,5 @@
 import { TranslationOutlined } from '@ant-design/icons';
-import { Col, Dropdown, Layout, Row, Typography } from 'antd';
+import { Col, Dropdown, Layout, Row } from 'antd';
 import React from 'react';
 import { Language, Size } from '../../constants';
 import { useI18n, useTheme } from '../../utils';
@@ -7,10 +7,13 @@ import { OverlayAlertsWithButton } from '../Alerts';
 import { BuilderSelect } from './builder-select';
 import { Menus } from './menus';
 import './header.sass';
+import { Client } from '@rsdoctor/types';
+import { useNavigate } from 'react-router-dom';
 
 export const Header: React.FC = () => {
   const { i18n } = useI18n();
 
+  const navigate = useNavigate();
   const { isLight } = useTheme();
   const iconStyle: React.CSSProperties = {
     display: 'inline-block',
@@ -61,26 +64,18 @@ export const Header: React.FC = () => {
             }}
           >
             <img
-              style={{ height: 30 }}
-              src={
-                'https://assets.rspack.dev/rsdoctor/rsdoctor-logo-960x960.png'
-              }
-              className="web-doctor-logo"
+              src="https://assets.rspack.dev/rsdoctor/rsdoctor-title-logo.png"
+              className="rsdoctor-logo"
               alt="logo"
-            />
-            <Typography.Text
-              style={{
-                color: 'inherit',
-                fontSize: 18,
-                marginLeft: 4,
-                marginTop: 8,
+              onClick={() => {
+                navigate(Client.RsdoctorClientRoutes.Home);
               }}
-            >
-              Rsdoctor
-            </Typography.Text>
+            />
             <BuilderSelect />
           </div>
         </Col>
+        <Menus style={{ transition: 'none' }} />
+
         <Col flex={1}>
           <Row
             align="middle"
@@ -92,7 +87,6 @@ export const Header: React.FC = () => {
             <Col>
               <OverlayAlertsWithButton />
             </Col>
-            <Menus style={{ transition: 'none' }} />
 
             {/* <Col> TODO:  dark mode has some error need fix.
               <Switch

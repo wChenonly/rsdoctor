@@ -1,6 +1,6 @@
 import { SDK, Plugin } from '@rsdoctor/types';
 import path from 'path-browserify';
-import { ModuleGraph, Module, Statement, ChunkGraph } from '@rsdoctor/graph';
+import { ModuleGraph, Module, Statement } from '@rsdoctor/graph';
 import { isImportDependency, getImportKind } from './utils';
 import { getPositionByStatsLocation } from './compatible';
 
@@ -63,7 +63,7 @@ function getModulesFromChunks(
 export function getModuleGraphByStats(
   { modules, chunks }: Plugin.StatsCompilation,
   root: string,
-  chunkGraph: ChunkGraph,
+  chunkGraph: SDK.ChunkGraphInstance,
 ) {
   ModuleGraph.init();
 
@@ -92,6 +92,8 @@ export function getModuleGraphByStats(
       getGetModuleName(root, data),
       data.depth === 0,
       isConcatenated ? SDK.ModuleKind.Concatenation : SDK.ModuleKind.Normal,
+      data.id ? String(data.id) : undefined,
+      data.layer!,
     );
 
     data.chunks?.forEach((_chunkId) => {
@@ -131,6 +133,8 @@ export function getModuleGraphByStats(
           getGetModuleName(root, normal),
           normal.depth === 0,
           SDK.ModuleKind.Normal,
+          normal.id ? String(normal.id) : undefined,
+          normal.layer,
         );
 
       if (normal.chunks?.length) {
@@ -181,11 +185,10 @@ export function getModuleGraphByStats(
     // webpack@5.x has type === 'from origin' https://github.com/webpack/webpack/blob/HEAD/lib/stats/DefaultStatsFactoryPlugin.js#L2220
     (module.reasons ?? [])
       .filter((item) => item.type === 'from origin')
-      .forEach(
-        (dep) =>
-          dep?.children?.forEach((_d: Plugin.StatsModuleReason) =>
-            dependencies.push({ ...dep, ..._d, children: undefined }),
-          ),
+      .forEach((dep) =>
+        dep?.children?.forEach((_d: Plugin.StatsModuleReason) =>
+          dependencies.push({ ...dep, ..._d, children: undefined }),
+        ),
       );
 
     for (const dep of dependencies) {

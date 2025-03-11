@@ -17,7 +17,7 @@ import type {
   RsdoctorWebpackPluginOptions,
 } from '@rsdoctor/core/types';
 import { ChunkGraph, ModuleGraph } from '@rsdoctor/graph';
-import { openBrowser, RsdoctorWebpackSDK } from '@rsdoctor/sdk';
+import { openBrowser, RsdoctorSDK } from '@rsdoctor/sdk';
 import { Constants, Linter, Manifest, SDK } from '@rsdoctor/types';
 import { Process } from '@rsdoctor/utils/build';
 import { chalk, debug } from '@rsdoctor/utils/logger';
@@ -38,7 +38,7 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
 
   public readonly options: RsdoctorPluginOptionsNormalized<Rules>;
 
-  public readonly sdk: RsdoctorWebpackSDK;
+  public readonly sdk: RsdoctorSDK;
 
   public readonly isRsdoctorPlugin: boolean;
 
@@ -54,19 +54,21 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
     this.options = normalizeUserConfig<Rules>(options);
     this.sdk =
       this.options.sdkInstance ??
-      new RsdoctorWebpackSDK({
+      new RsdoctorSDK({
         port: this.options.port,
         name: pluginTapName,
         root: process.cwd(),
-        type: this.options.reportCodeType,
+        type: this.options.output.reportCodeType,
         config: {
           disableTOSUpload: this.options.disableTOSUpload,
           innerClientPath: this.options.innerClientPath,
           printLog: this.options.printLog,
-          mode: this.options.mode ? this.options.mode : undefined,
+          mode: this.options.mode,
           brief: this.options.brief,
+          compressData: this.options.output.compressData,
         },
       });
+
     this.modulesGraph = new ModuleGraph();
     this.chunkGraph = new ChunkGraph();
     this.isRsdoctorPlugin = true;
@@ -163,7 +165,7 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
 
     this.sdk.setOutputDir(
       path.resolve(
-        this.options.reportDir || compiler.outputPath,
+        this.options.output.reportDir || compiler.outputPath,
         `./${Constants.RsdoctorOutputFolder}`,
       ),
     );

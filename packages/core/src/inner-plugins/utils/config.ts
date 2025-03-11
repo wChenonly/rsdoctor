@@ -1,16 +1,22 @@
 import { Common, Linter, Plugin, SDK } from '@rsdoctor/types';
 import assert from 'assert';
-import type { RuleSetCondition as RspackRuleSetCondition } from '@rspack/core';
+import type {
+  RuleSetCondition as RspackRuleSetCondition,
+  RuleSetRule as RspackRuleSetRule,
+} from '@rspack/core';
 import {
-  RuleSetCondition,
-  RuleSetConditionAbsolute,
-  RuleSetRule,
+  RuleSetCondition as WebpackRuleSetCondition,
+  RuleSetConditionAbsolute as WebpackRuleSetConditionAbsolute,
+  RuleSetRule as WebpackRuleSetRule,
 } from 'webpack';
 import {
   RsdoctorWebpackPluginOptions,
   RsdoctorPluginOptionsNormalized,
   IReportCodeType,
+  RsdoctorRspackPluginOptions,
+  RsdoctorRspackPluginOptionsNormalized,
 } from '@/types';
+import { chalk, logger } from '@rsdoctor/utils/logger';
 
 function defaultBoolean(v: unknown, dft: boolean): boolean {
   return typeof v === 'boolean' ? v : dft;
@@ -25,15 +31,17 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
     loaderInterceptorOptions = {},
     disableClientServer = false,
     sdkInstance,
-    reportCodeType = {
-      noModuleSource: false,
-      noAssetsAndModuleSource: false,
-      noCode: false,
-      sourceCode: true,
-      assetsCode: true,
-    },
     disableTOSUpload = false,
     innerClientPath = '',
+    output = {
+      reportCodeType: {
+        noModuleSource: false,
+        noAssetsAndModuleSource: false,
+        noCode: false,
+      },
+      reportDir: '',
+      compressData: true,
+    },
     supports = {
       parseBundle: true,
       banner: undefined,
@@ -47,7 +55,6 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
       reportHtmlName: undefined,
       writeDataJson: false,
     },
-    reportDir = '',
   } = config;
 
   assert(linter && typeof linter === 'object');
@@ -96,14 +103,28 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
     },
     disableClientServer,
     sdkInstance,
-    /**
-     * Data storage is divided into three types:
-     * The first type: normal mode, all codes are saved.
-     * The second type: lite is the same as reportCodeType.noModuleSource, which lacks module source code.
-     * The third type: reportCodeType.noAssetsAndModuleSource means there is no module source code nor the packaged product code.
-     *
-     *  */
-    reportCodeType: normalizeReportType(reportCodeType, mode),
+    output: {
+      /**
+       * Data storage is divided into three types:
+       * The first type: normal mode, all codes are saved.
+       * The second type: lite is the same as reportCodeType.noModuleSource, which lacks module source code.
+       * The third type: reportCodeType.noAssetsAndModuleSource means there is no module source code nor the packaged product code.
+       *
+       *  */
+      reportCodeType: output.reportCodeType
+        ? normalizeReportType(output.reportCodeType, mode)
+        : normalizeReportType(
+            {
+              noModuleSource: false,
+              noAssetsAndModuleSource: false,
+              noCode: false,
+            },
+            mode,
+          ),
+      reportDir: output.reportDir || '',
+      compressData:
+        output.compressData !== undefined ? output.compressData : true,
+    },
     disableTOSUpload,
     innerClientPath,
     supports,
@@ -111,17 +132,27 @@ export function normalizeUserConfig<Rules extends Linter.ExtendRuleData[]>(
     printLog,
     mode,
     brief,
-    reportDir,
   };
-
+  if (
+    output.compressData === false &&
+    ((output.reportCodeType &&
+      !output.reportCodeType?.noAssetsAndModuleSource) ||
+      !output.reportCodeType)
+  ) {
+    logger.info(
+      chalk.yellow(
+        `[RSDOCTOR]: When you use compressData: false, it is recommended to set output.reportCodeType to { noAssetsAndModuleSource: true }.`,
+      ),
+    );
+  }
   return res;
 }
 
 export function makeRuleSetSerializable(
   item:
-    | RuleSetConditionAbsolute
-    | RuleSetCondition
     | RspackRuleSetCondition
+    | WebpackRuleSetConditionAbsolute
+    | WebpackRuleSetCondition
     | void,
 ) {
   if (!item) return;
@@ -139,7 +170,10 @@ export function makeRuleSetSerializable(
 }
 
 export function makeRulesSerializable(
-  rules: Plugin.RuleSetRule[] | RuleSetRule['oneOf'],
+  rules:
+    | Plugin.RuleSetRule[]
+    | RspackRuleSetRule['oneOf']
+    | WebpackRuleSetRule['oneOf'],
 ) {
   if (!Array.isArray(rules)) return;
 
@@ -192,10 +226,10 @@ export const normalizeReportType = (
     default: {
       if (reportCodeType.noCode) {
         globalReportCodeType = SDK.ToDataType.NoCode;
-      } else if (reportCodeType.noModuleSource) {
-        globalReportCodeType = SDK.ToDataType.NoSource;
       } else if (reportCodeType.noAssetsAndModuleSource) {
         globalReportCodeType = SDK.ToDataType.NoSourceAndAssets;
+      } else if (reportCodeType.noModuleSource) {
+        globalReportCodeType = SDK.ToDataType.NoSource;
       } else {
         globalReportCodeType = SDK.ToDataType.Normal;
       }
@@ -203,3 +237,16 @@ export const normalizeReportType = (
   }
   return globalReportCodeType;
 };
+
+export function normalizeRspackUserOptions<
+  Rules extends Linter.ExtendRuleData[],
+>(
+  options: RsdoctorRspackPluginOptions<Rules>,
+): RsdoctorRspackPluginOptionsNormalized<Rules> {
+  const config: RsdoctorRspackPluginOptionsNormalized<Rules> =
+    normalizeUserConfig(options);
+  config.experiments ??= {};
+  config.experiments.enableNativePlugin =
+    options.experiments?.enableNativePlugin ?? false;
+  return config;
+}

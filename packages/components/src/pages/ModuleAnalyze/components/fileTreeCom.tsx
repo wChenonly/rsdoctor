@@ -1,15 +1,16 @@
-import { InfoCircleOutlined, MinusCircleOutlined, PlusCircleOutlined, RightSquareTwoTone } from '@ant-design/icons';
-import { SDK } from '@rsdoctor/types';
-import { Popover, Space, Tag, Typography } from 'antd';
+import {
+  MinusCircleOutlined,
+  PlusCircleOutlined,
+  RightSquareOutlined,
+} from '@ant-design/icons';
+import { Popover, Space, Typography } from 'antd';
 import React, { useCallback } from 'react';
 import Tree, { DefaultNodeProps, useTreeState } from 'react-hyper-tree';
 
-import { ServerAPIProvider } from 'src/components/Manifest';
-import { TAG_PALLETE } from 'src/constants';
-
 import { ModuleGraphListContext } from '../../BundleSize/config';
 import { NewTreeNodeType } from '../utils/hooks';
-import './fileTreeCom.sass';
+import './fileTreeCom.scss';
+import { getFileCom } from 'src/components/FileTree';
 
 const prefix = 'file-tree-com';
 
@@ -25,7 +26,12 @@ type FileTreeProps = {
 };
 
 export const FileTree: React.FC<FileTreeProps> = (props) => {
-  const { treeData, needJumpto = false, defaultOpened = false, defaultOpenFather = 0 } = props;
+  const {
+    treeData,
+    needJumpto = false,
+    defaultOpened = false,
+    defaultOpenFather = 0,
+  } = props;
 
   const { required, handlers } = useTreeState({
     id: `${prefix}-tree`,
@@ -36,7 +42,10 @@ export const FileTree: React.FC<FileTreeProps> = (props) => {
   });
 
   const renderNode = useCallback(({ node, onToggle }: DefaultNodeProps) => {
-    defaultOpenFather && node.data.level < defaultOpenFather && node.setOpened(true);
+    defaultOpenFather &&
+      node.data.level < defaultOpenFather &&
+      node.setOpened(true);
+    const Icon = getFileCom(node.data.name);
 
     return (
       <div className={`${prefix}-titles-box`} key={node.data.name}>
@@ -45,19 +54,22 @@ export const FileTree: React.FC<FileTreeProps> = (props) => {
             <div className={`${prefix}-node-title`}>
               <Space>
                 <div onClick={onToggle}>
-                  {!node.options.opened && node.data.children?.length ? (
-                    <PlusCircleOutlined style={{ color: 'lightblue' }} />
-                  ) : (
-                    <MinusCircleOutlined style={{ color: 'lightblue' }} />
-                  )}
-                  <Typography.Text code>
-                    {node.data.name}
+                  <Space>
+                    {!node.options.opened && node.data.children?.length ? (
+                      <PlusCircleOutlined style={{ color: 'lightblue' }} />
+                    ) : (
+                      <MinusCircleOutlined style={{ color: 'lightblue' }} />
+                    )}
+                    {Icon}
                     <Popover
                       key={`${node.data.name}popover`}
                       content={
                         <>
                           {node.data.__RESOURCEPATH__ ? (
-                            <Typography.Text key={`${node.data.name}-popover-path`} code>
+                            <Typography.Text
+                              key={`${node.data.name}-popover-path`}
+                              code
+                            >
                               {node.data.__RESOURCEPATH__}
                             </Typography.Text>
                           ) : (
@@ -68,54 +80,16 @@ export const FileTree: React.FC<FileTreeProps> = (props) => {
                       title="INFO"
                       trigger="hover"
                     >
-                      <InfoCircleOutlined style={{ marginLeft: 4 }} />
+                      <Typography.Text>{node.data.name}</Typography.Text>
                     </Popover>
-                  </Typography.Text>
+                  </Space>
                 </div>
                 <Space>
-                  {node.data.concatModules?.length ? (
-                    <Popover
-                      content={
-                        <ServerAPIProvider
-                          api={SDK.ServerAPI.API.GetModulesByModuleIds}
-                          body={{ moduleIds: node.data.concatModules || [] }}
-                        >
-                          {(res) => {
-                            return (
-                              <div>
-                                {res.map(({ path }, index) => (
-                                  <p key={`${path}-${index}`}>{path}</p>
-                                ))}
-                              </div>
-                            );
-                          }}
-                        </ServerAPIProvider>
-                      }
-                      title="Concatenated Module Name"
-                      trigger="hover"
-                    >
-                      <Tag
-                        key={`${node.data.name}-size-tag`}
-                        className={`${prefix}-node-title-tag`}
-                        color={TAG_PALLETE.DARK_BLUE}
-                      >
-                        {'Concatenated'}
-                      </Tag>
-                    </Popover>
-                  ) : node.data.size && node.data.size !== '0 bytes' ? (
-                    <Tag
-                      key={`${node.data.name}-size-tag`}
-                      className={`${prefix}-node-title-tag`}
-                      color={TAG_PALLETE.COLOR_B}
-                    >{`Bundled: ${node.data.size}`}</Tag>
-                  ) : (
-                    <></>
-                  )}
                   {needJumpto && (
                     <ModuleGraphListContext.Consumer>
                       {({ moduleJumpList, setModuleJumpList }) => {
                         return (
-                          <RightSquareTwoTone
+                          <RightSquareOutlined
                             onClick={() => {
                               const _list = [...moduleJumpList];
                               _list.push(+node.id);

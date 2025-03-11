@@ -1,22 +1,22 @@
-# Duplicate Dependency Problem
+# Duplicate dependency problem
 
-Rsdoctor will report cases where multiple duplicate dependencies exist in the same builder's artifact.
+Rsdoctor will report cases where multiple duplicate dependencies exist in the same bundler's artifact.
 
-<img src="https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/usage/bundle/bundle-alerts.png" />
+<img src="https://assets.rspack.dev/others/assets/rsdoctor/bundle-alerts.png" />
 
-## Hazards of Duplicate Packages
+## Hazards of duplicate packages
 
 - **Security**
   - Many packages adopt singleton mode and are only loaded once by default. Examples include core-js, react, and some component libraries. Having multiple versions coexist can cause runtime errors.
-- **Runtime Perßformance**
+- **Runtime Performance**
   - Increases artifact size, slowing down network transmission
   - Same code for the same functionality runs multiple times
 
-## How to Solve Duplicate Package Problems?
+## How to solve duplicate package Problems?
 
 To solve the issue of multiple versions of dependencies, you can address it from both the dependency and build aspects.
 
-### Dependency Aspect
+### Dependency aspect
 
 #### 1. Use the npm dedupe command
 
@@ -34,14 +34,13 @@ The advantage of these features is that they can break free from the constraints
 
 However, before using them, it is important to consider the compatibility between package versions and evaluate whether optimization is necessary. For example, whether the logic changes between different versions of the same package will affect the functionality of the project.
 
-### Build Aspect
+### Build aspect
 
 #### Use [resolve.alias](https://www.rspack.dev/config/resolve.html#resolvealias)
 
-Almost all builders support modifying the paths for resolving npm packages. Therefore, we can eliminate duplicate dependencies by manually specifying the resolve paths for packages during compilation. For example, using **Rspack** or **Webpack**, if `lodash` is duplicated in the build, we can configure it as follows to specify the resolve paths for all `lodash` packages to the `node_modules` directory in the current directory.
+Almost all bundlers support customizing the resolution paths for npm packages. Therefore, we can eliminate duplicate dependencies by manually specifying the resolve paths for packages during compilation. For example, using **Rspack** or **Webpack**, if `lodash` is duplicated in the build, we can configure it as follows to specify the resolve paths for all `lodash` packages to the `node_modules` directory in the current directory.
 
-```js
-// webpack.config.js/rspack.config.js
+```js title="rspack.config.js"
 const path = require('path');
 
 module.exports = {
@@ -56,9 +55,9 @@ module.exports = {
 
 This method also requires attention to the compatibility between package versions.
 
-## Cases of Handling Duplicate Packages
+## Cases of handling duplicate packages
 
-### Duplicate Packages in pnpm-workspace
+### Duplicate packages in pnpm-workspace
 
 In this project, the `web` app depends on `react@18.2.0` and imports `component` using `"component": "workspace:*"`. The `component` package, in turn, depends on `react@18.1.0`. The project structure is as follows:
 
@@ -71,7 +70,7 @@ In this project, the `web` app depends on `react@18.2.0` and imports `component`
 │       │   └── react      -> ../../../node_modules/.pnpm/react@18.2.0
 │       ├── src
 │       │   └── index.js
-│       ├── webpack.config.js
+│       ├── rspack.config.js
 │       └── package.json
 └── packages
     └── component
@@ -82,14 +81,14 @@ In this project, the `web` app depends on `react@18.2.0` and imports `component`
         └── package.json
 ```
 
-When executing `webpack build` under `apps/web`, the code in the `web` directory will be resolved to `react@18.2.0`, and then the code in the `component` directory will be resolved to `react@18.1.0`. This results in the output of the web project containing two versions of `React`.
+When executing `rspack build` under `apps/web`, the code in the `web` directory will be resolved to `react@18.2.0`, and then the code in the `component` directory will be resolved to `react@18.1.0`. This results in the output of the web project containing two versions of `React`.
 
 #### Solution
 
-This issue can be resolved using the `resolve.alias` configuration in the builder, such as `Rspack` or `Webpack`. By specifying the resolve path for `React` to only resolve to `apps/web/node_modules/react`, you can ensure that only one version of `React` is included in the output. Here is an example code:
+This issue can be resolved using the `resolve.alias` configuration of the bundler, such as Rspack or webpack. By specifying the resolve path for `React` to only resolve to `apps/web/node_modules/react`, you can ensure that only one version of `React` is included in the output. Here is an example code:
 
 ```javascript
-// apps/web/webpack.config.js
+// apps/web/rspack.config.js
 const path = require('path');
 
 module.exports = {
@@ -102,7 +101,7 @@ module.exports = {
 };
 ```
 
-#### Duplicate Packages Caused by Peer Dependency
+#### Duplicate packages caused by peer dependency
 
 This handling method also applies to projects with duplicate packages caused by multiple instances of **[peerDependencies](https://pnpm.io/how-peers-are-resolved)** in `pnpm workspace`. The project directory structure is as follows:
 
@@ -116,7 +115,7 @@ This handling method also applies to projects with duplicate packages caused by 
 │       │   └── debug      ->  ../../../node_modules/.pnpm/debug@4.3.4
 │       ├── src
 │       │   └── index.js
-│       ├── webpack.config.js
+│       ├── rspack.config.js
 │       └── package.json
 └── packages
     └── component
@@ -127,14 +126,14 @@ This handling method also applies to projects with duplicate packages caused by 
         └── package.json
 ```
 
-In this project, when executing `webpack build` under `apps/web`, the code in the `web` directory will be resolved to `axios@0.27.2_debug@4.3.4`, and then the code in the `packages/component` directory will be resolved to `axios@0.27.2`.
+In this project, when executing `rspack build` under `apps/web`, the code in the `web` directory will be resolved to `axios@0.27.2_debug@4.3.4`, and then the code in the `packages/component` directory will be resolved to `axios@0.27.2`.
 
 Although they are the same version, they have different paths, resulting in two copies of `axios` in the output.
 
 The solution is to configure the `web` project to only resolve the `axios` package under the `web` directory's `node_modules`.
 
 ```javascript
-// apps/web/webpack.config.js
+// apps/web/rspack.config.js
 alias: {
   'axios': path.resolve(__dirname, 'node_modules/axios')
 }

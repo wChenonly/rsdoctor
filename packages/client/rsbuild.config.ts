@@ -4,9 +4,10 @@ import { pluginTypeCheck } from '@rsbuild/plugin-type-check';
 import { pluginNodePolyfill } from '@rsbuild/plugin-node-polyfill';
 import type { Rspack, RsbuildConfig } from '@rsbuild/core';
 import { pluginSass } from '@rsbuild/plugin-sass';
-import serve from 'serve-static';
+import serve from 'sirv';
 import path from 'path';
 import fs from 'fs';
+
 import {
   ClientEntry,
   DistPath,
@@ -67,10 +68,12 @@ export default defineConfig(({ env }) => {
         ? OFFICIAL_PREVIEW_PUBLIC_PATH?.replace(/\/resource$/, '') || './'
         : './',
       cleanDistPath: IS_PRODUCTION,
-      sourceMap: {
-        js: false,
-        css: false,
-      },
+      sourceMap: IS_PRODUCTION
+        ? false
+        : {
+            js: 'cheap-module-source-map',
+            css: true,
+          },
       legalComments: 'none',
     },
 
@@ -146,6 +149,7 @@ export default defineConfig(({ env }) => {
                     ids: true,
                     version: true,
                     entrypoints: true,
+                    optimizationBailout: true,
                   });
                   await fs.promises.writeFile(
                     WebpackStatsFilePath,
@@ -161,12 +165,15 @@ export default defineConfig(({ env }) => {
           chainConfig.plugin('rsdoctor').use(RsdoctorRspackPlugin, [
             {
               disableClientServer: !ENABLE_CLIENT_SERVER,
-              features: {
-                loader: true,
-                plugins: true,
-                resolver: true,
-                bundle: true,
-                treeShaking: true,
+              linter: {
+                rules: {
+                  'ecma-version-check': [
+                    'Warn',
+                    {
+                      ecmaVersion: 3,
+                    },
+                  ],
+                },
               },
             },
           ]);
@@ -181,15 +188,15 @@ export default defineConfig(({ env }) => {
     server: {
       port: PortForWeb,
       historyApiFallback: true,
+      open: ENABLE_CLIENT_SERVER ? undefined : true,
     },
 
     dev: {
-      startUrl: ENABLE_CLIENT_SERVER ? undefined : true,
       setupMiddlewares: [
         (middlewares) => {
           if (fs.existsSync(WebpackRsdoctorDirPath)) {
             const fn = serve(WebpackRsdoctorDirPath, {
-              index: false,
+              dev: true,
               setHeaders(res) {
                 res.setHeader('Content-Type', 'text/plain; charset=utf-8');
               },

@@ -122,6 +122,7 @@ export function mapEachRules<T extends Plugin.BuildRuleSetRule>(
         const newRule = {
           ...rule,
           use: (...args: any) => {
+            // @ts-expect-error TODO: data type is not the same between webpack and rspack
             const rules = funcUse.apply(null, args) as T[];
             return mapEachRules(rules, callback);
           },
@@ -376,7 +377,6 @@ export function createLoaderContextTrap(
             if (typeof target.query === 'object') {
               const options = target.query[Loader.LoaderInternalPropertyName];
 
-              // webpack4 https://v4.webpack.js.org/api/loaders/#thisquery
               // webpack5 https://webpack.js.org/api/loaders/#thisquery
               if (options.hasOptions) {
                 return omit(target.query, [Loader.LoaderInternalPropertyName]);

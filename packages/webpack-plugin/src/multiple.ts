@@ -1,8 +1,10 @@
-import { RsdoctorSDKController } from '@rsdoctor/sdk';
+import { RsdoctorPrimarySDK, RsdoctorSDKController } from '@rsdoctor/sdk';
 import type { Linter } from '@rsdoctor/types';
 import type { RsdoctorMultiplePluginOptions } from '@rsdoctor/core';
 
 import { RsdoctorWebpackPlugin } from './plugin';
+import { normalizeUserConfig } from '@rsdoctor/core/plugins';
+import type { Compiler } from 'webpack';
 
 let globalController: RsdoctorSDKController | undefined;
 
@@ -22,10 +24,20 @@ export class RsdoctorWebpackMultiplePlugin<
       return controller;
     })();
 
+    const normallizedOptions = normalizeUserConfig<Rules>(options);
+
     const instance = controller.createSlave({
       name: options.name || 'Builder',
       stage: options.stage,
-      extraConfig: { disableTOSUpload: options.disableTOSUpload || false },
+      extraConfig: {
+        disableTOSUpload: normallizedOptions.disableTOSUpload || false,
+        innerClientPath: normallizedOptions.innerClientPath,
+        printLog: normallizedOptions.printLog,
+        mode: normallizedOptions.mode ? normallizedOptions.mode : undefined,
+        brief: normallizedOptions.brief,
+        compressData: normallizedOptions.output.compressData,
+      },
+      type: normallizedOptions.output.reportCodeType,
     });
 
     super({
@@ -34,5 +46,14 @@ export class RsdoctorWebpackMultiplePlugin<
     });
 
     this.controller = controller;
+  }
+
+  apply(compiler: Compiler) {
+    if ('dependencies' in compiler.options) {
+      (this.sdk as RsdoctorPrimarySDK).dependencies =
+        compiler.options.dependencies;
+    }
+
+    super.apply(compiler);
   }
 }

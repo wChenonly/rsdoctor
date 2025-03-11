@@ -1,5 +1,6 @@
 {
   "name": "@examples/doctor-modern-minimal",
+  "private": true,
   "version": "0.0.1",
   "files": [
     "dist"
@@ -11,13 +12,14 @@
   },
   "license": "MIT",
   "dependencies": {
+    "antd": "5.15.3",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@modern-js/app-tools": "^2.60.3",
     "@modern-js/runtime": "^2.60.3",
     "@rsdoctor/webpack-plugin": "workspace:*",
-    "@modern-js/app-tools": "^2.60.3",
     "@types/node": "^16",
     "@types/react": "^18",
     "@types/react-dom": "^18",

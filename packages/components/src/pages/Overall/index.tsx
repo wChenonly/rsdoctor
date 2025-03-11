@@ -1,13 +1,18 @@
 import { SDK } from '@rsdoctor/types';
 import React from 'react';
-import { BundleAlerts, CompileAlerts } from '../../components/Alerts';
+import { Flex } from 'antd';
+
+import { HelpCenter } from '../../components/Overall/help-center';
+import { BundleAlerts } from '../../components/Alerts';
 import { withServerAPI } from '../../components/Manifest';
 import {
   BundleOverall,
   CompileOverall,
   ProjectOverall,
 } from '../../components/Overall';
-import { ResponsiveGridLayout } from './responsiveGridList';
+import { ResponsiveLayout } from './responsiveLayout';
+
+import style from './index.module.scss';
 
 interface Props {
   project: SDK.ServerAPI.InferResponseType<SDK.ServerAPI.API.GetProjectInfo>;
@@ -17,21 +22,28 @@ const Component: React.FC<Props> = ({ project }) => {
   const { summary, configs, root: cwd, envinfo, errors } = project;
 
   return (
-    <div>
-      <ResponsiveGridLayout>
-        <ProjectOverall
-          configs={configs}
-          cwd={cwd}
-          envinfo={envinfo}
-          alerts={errors}
-        />
-        <BundleOverall errors={errors} cwd={cwd} />
-        <CompileOverall summary={summary} />
-      </ResponsiveGridLayout>
+    <div className={style.overall}>
+      <Flex style={{ width: '100%' }}>
+        <div style={{ flex: 3, marginRight: '16px', maxWidth: '75%' }}>
+          <ResponsiveLayout>
+            <ProjectOverall
+              configs={configs}
+              cwd={cwd}
+              envinfo={envinfo}
+              alerts={errors}
+            />
+            <BundleAlerts />
+          </ResponsiveLayout>
+        </div>
 
-      <CompileAlerts />
-
-      <BundleAlerts />
+        <div style={{ flex: 1 }}>
+          <ResponsiveLayout>
+            <BundleOverall errors={errors} cwd={cwd} />
+            <CompileOverall summary={summary} />
+            <HelpCenter />
+          </ResponsiveLayout>
+        </div>
+      </Flex>
     </div>
   );
 };

@@ -24,11 +24,11 @@
 
 - 概览页（即首页）能够知道**项目配置、诊断信息、编译信息、产物情况**。
 
-![Overall](https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/overall.jpg)
+![Overall](https://assets.rspack.dev/others/assets/rsdoctor/project-overall-1.jpg)
 
 - 除了有项目概览之外，我们还提供了诊断模块，分别是编译诊断、重复包诊断等。如果你的编译、产物命中了我们定义的诊断规则，就会在工具首页出现对应的警示模块, **其中重复包可以查看到详细的引用路径**:
 
-![Overall-Alerts](https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/overall-alerts.jpg)
+![Overall-Alerts](https://assets.rspack.dev/others/assets/rsdoctor/overall-alerts.png)
 
 ### ⭐️ 编译分析
 
@@ -38,18 +38,14 @@
 
 - 该模块主要提供了 **Rspack 或 Webpack 的 Loaders** 内的输入输出、预估耗时、参数等数据分析的功能。
 
-<div style={{ display: 'flex' }}>
   <img
-    src="https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/usage/compile/loader-timeline-overall.png"
-    width="55%"
+    src="https://assets.rspack.dev/others/assets/rsdoctor/loader-timeline-overall.png"
     style={{ margin: 'auto' }}
   />
   <img
-    src="https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/usage/compile/loader-anlaysis-all.png"
-    width="45%"
+    src="https://assets.rspack.dev/others/assets/rsdoctor/loader-analysis-all.png"
     style={{ margin: 'auto' }}
   />
-</div>
 
 #### Plugin 分析
 
@@ -58,9 +54,7 @@
 <p>
   <img
     alt="bundle"
-    src={
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/compile-plugin.jpg'
-    }
+    src={'https://assets.rspack.dev/others/assets/rsdoctor/compile-plugin.jpg'}
     width="600px"
     style={{ margin: 'auto' }}
   />
@@ -73,9 +67,7 @@
 <p>
   <img
     alt="bundle"
-    src={
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/resolver.jpeg'
-    }
+    src={'https://assets.rspack.dev/others/assets/rsdoctor/resolver.png'}
     width="700px"
     style={{ margin: 'auto' }}
   />
@@ -91,14 +83,14 @@
   <img
     alt="bundle"
     src={
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/bundle-size.jpg'
+      'https://assets.rspack.dev/others/assets/rsdoctor/bundle-size-overall.png'
     }
     width="700px"
     style={{ margin: 'auto' }}
   />
 </p>
 
-### ⭐️ Bundle Diff
+### ⭐️ Bundle diff
 
 ::: tip
 功能支持中...
@@ -106,8 +98,8 @@
 
 使用 Rsdoctor 提供的 Bundle Diff 功能，可以看到产物内的资源体积、重复包、Packages 等数据的变化以及每个资源中的模块文件的大小及代码的变化。
 
-| ![bundle-diff-1](https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/bundle-diff-2.png) | ![bundle-diff-2](https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/bundle-diff-1.png) |
-| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| ![bundle-diff-1](https://assets.rspack.dev/others/assets/rsdoctor/bundle-diff-2.png) | ![bundle-diff-2](https://assets.rspack.dev/others/assets/rsdoctor/bundle-diff-1.png) |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 
 ## 🧑‍💻 社区
 

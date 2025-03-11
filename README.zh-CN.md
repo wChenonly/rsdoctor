@@ -36,8 +36,7 @@
 
 - **编译可视化**：Rsdoctor 将编译行为及耗时进行可视化展示，方便开发同学查看构建问题。
 
-| <img src="https://github.com/web-infra-dev/rsdoctor/assets/18437716/eea845fa-f19f-49d4-9bc6-6795688e6a33"  alt="loader timeline" /> | <img src="https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/rsdoctor-analyze-code.png" alt="loader codes" /> |
-| ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+https://github.com/user-attachments/assets/3400e0a2-a1dc-4a14-9466-6283af9dd9ed
 
 - **多种分析能力**：支持构建产物、构建时分析能力：
   - 构建产物支持资源列表及模块依赖等。
@@ -61,9 +60,9 @@
 
 ## 🪐 相关链接
 
-- [Rspack](https://github.com/web-infra-dev/rspack): 基于 rust 的 web 构建器。
-- [Rsbuild](https://github.com/web-infra-dev/rsbuild): 基于 Rspack 的 web 构建工具。
-- [Rslib](https://github.com/web-infra-dev/rslib): 基于 Rsbuild 的 library 构建工具。
+- [Rspack](https://github.com/web-infra-dev/rspack)：基于 Rust 的高性能打包工具。
+- [Rsbuild](https://github.com/web-infra-dev/rsbuild): 基于 Rspack 的构建工具。
+- [Rslib](https://github.com/web-infra-dev/rslib): 基于 Rsbuild 的 library 开发工具。
 - [Rspress](https://github.com/web-infra-dev/rspress): 基于 Rsbuild 的静态站点生成器。
 - [Modern.js](https://github.com/web-infra-dev/modern.js): 基于 Rsbuild 的渐进式 React 框架。
 

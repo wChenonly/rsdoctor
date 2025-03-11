@@ -1,7 +1,7 @@
 name: "🐞 Bug Report"
 description: Report a Bug to Rsdoctor
 title: "[Bug]: "
-labels: ["🐞 bug"]
+type: Bug
 body:
   - type: markdown
     attributes:

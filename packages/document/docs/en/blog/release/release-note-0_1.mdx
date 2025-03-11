@@ -1,4 +1,4 @@
-# Rsdoctor v0.1 Release Note
+# Rsdoctor v0.1 release note
 
 <picture>
   <img
@@ -16,7 +16,7 @@ Rsdoctor is a one-stop build analysis tool for Rspack and Webpack. It allows for
 
 **Rsdoctor** is a build analysis tool for analyzing projects built with [Rspack](https://www.rspack.dev/) and [Webpack](https://webpack.js.org/). It supports analysis of projects such as [Rsbuild](https://rsbuild.dev/), [Create React App](https://create-react-app.dev/), [Modern.js](https://modernjs.dev/), and more.
 
-![Position](https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/rsdoctor-position.png)
+![Position](https://assets.rspack.dev/others/assets/rsdoctor/rsdoctor-position.png)
 
 ## 🔥 Features
 
@@ -35,65 +35,61 @@ Rsdoctor is a one-stop build analysis tool for Rspack and Webpack. It allows for
 
 - The overview page (i.e. the home page) can know **project configuration, diagnostic information, compilation information, and product status**.
 
-![Overall](https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/overall.jpg)
+![Overall](https://assets.rspack.dev/others/assets/rsdoctor/project-overall-1.jpg)
 
 - In addition to the project overview, we also provide diagnostic functions, including compilation diagnostics and duplicate packages diagnostics. If your compilation and products hit the diagnostic rules we defined,
   the corresponding warning alerts will appear on the tool's home page. **where you can see the detailed reference path of duplicate packages**:
 
-![Overall-Alerts](https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/overall-alerts.jpg)
+![Overall-Alerts](https://assets.rspack.dev/others/assets/rsdoctor/overall-alerts.png)
 
-### ⭐️ Compilation Analysis
+### ⭐️ Compilation analysis
 
 Provides corresponding data and analysis functions for **Loaders, Plugins, and Module Resolve** to help you analyze problems in the compilation process.
 
-#### Loader Analysis
+#### Loader analysis
 
 - This module mainly provides the function of data analysis such as input and output, estimated time consumption, and parameters within **Rspack or Webpack Loaders**.
 
 <div style={{ display: 'flex' }}>
   <img
-    src="https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/usage/compile/loader-timeline-overall.png"
+    src="https://assets.rspack.dev/others/assets/rsdoctor/rsdoctor-loader-timeline.png"
     width="55%"
     style={{ margin: 'auto' }}
   />
   <img
-    src="https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/usage/compile/loader-anlaysis-all.png"
+    src="https://assets.rspack.dev/others/assets/rsdoctor/loader-analysis-all.png"
     width="45%"
     style={{ margin: 'auto' }}
   />
 </div>
 
-#### Plugin Analysis
+#### Plugin analysis
 
 - This module mainly intercepts and collects data information such as the number of calls and estimated time consumption of Plugins.
 
 <p>
   <img
     alt="bundle"
-    src={
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/compile-plugin.jpg'
-    }
+    src={'https://assets.rspack.dev/others/assets/rsdoctor/compile-plugin.jpg'}
     width="600px"
     style={{ margin: 'auto' }}
   />
 </p>
 
-#### Resolve Analysis
+#### Resolve analysis
 
 - This module mainly provides path data and estimated time consumption for module resolution in a single file within the project. Rspack does not currently support this module.
 
 <p>
   <img
     alt="bundle"
-    src={
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/resolver.jpeg'
-    }
+    src={'https://assets.rspack.dev/others/assets/rsdoctor/resolver.png'}
     width="700px"
     style={{ margin: 'auto' }}
   />
 </p>
 
-### ⭐️ Product Analysis
+### ⭐️ Product analysis
 
 - In the **Bundle Size** page, we can see an overview of the product data information of the current project, as well as analyze the size and reasons for duplicate package imports.
 
@@ -103,18 +99,18 @@ Provides corresponding data and analysis functions for **Loaders, Plugins, and M
   <img
     alt="bundle"
     src={
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/lognuvj/rsdoctor/docs/start/bundle-size.jpg'
+      'https://assets.rspack.dev/others/assets/rsdoctor/bundle-size-overall.png'
     }
     width="700px"
     style={{ margin: 'auto' }}
   />
 </p>
 
-## 📚 Quick Start
+## 📚 Quick start
 
 You can refer to the [Quick Start](https://rsdoctor.dev/guide/start/quick-start) to get started with **Rsdoctor**.
 
-## 💡 Next Steps
+## 💡 Next steps
 
 **Improve Rsdoctor build analysis efficiency**: Currently, enabling Rsdoctor plugin increases project build time. In the next step, we will extract and convert some of Rsdoctor's build analysis logic into a rust plugin, built-in to [Rspack](https://www.rspack.dev/), in order to improve Rsdoctor's build analysis efficiency.
 

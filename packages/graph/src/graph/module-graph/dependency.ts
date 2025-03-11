@@ -1,6 +1,4 @@
 import { SDK } from '@rsdoctor/types';
-import type { Module } from './module';
-import { Statement } from './statement';
 
 let id = 1;
 
@@ -11,17 +9,17 @@ export class Dependency implements SDK.DependencyInstance {
     id = 1;
   }
 
-  readonly id: number;
+  id: number;
 
   readonly request: string;
 
-  readonly module: Module;
+  readonly module: SDK.ModuleInstance;
 
   readonly kind: SDK.DependencyKind;
 
-  readonly statements: Statement[] = [];
+  readonly statements: SDK.StatementInstance[] = [];
 
-  private _originDependency: Module;
+  private _originDependency: SDK.ModuleInstance;
 
   meta: SDK.DependencyBuildMeta = {
     exportsType: 'default-with-named',
@@ -29,10 +27,10 @@ export class Dependency implements SDK.DependencyInstance {
 
   constructor(
     request: string,
-    module: Module,
-    dependency: Module,
+    module: SDK.ModuleInstance,
+    dependency: SDK.ModuleInstance,
     kind: SDK.DependencyKind,
-    statements?: Statement[],
+    statements?: SDK.StatementInstance[],
   ) {
     this.id = id++;
     this.request = request;
@@ -71,13 +69,13 @@ export class Dependency implements SDK.DependencyInstance {
     );
   }
 
-  addStatement(statement: Statement): void {
+  addStatement(statement: SDK.StatementInstance): void {
     if (!this.hasStatement(statement)) {
       this.statements.push(statement);
     }
   }
 
-  hasStatement(statement: Statement): boolean {
+  hasStatement(statement: SDK.StatementInstance): boolean {
     return this.statements.some((item) => item.isSame(statement));
   }
 
@@ -99,5 +97,9 @@ export class Dependency implements SDK.DependencyInstance {
       originDependency: this.originDependency.id,
       statements: this.statements.map((item) => item.toData()),
     };
+  }
+
+  setId(id: number): void {
+    this.id = id;
   }
 }

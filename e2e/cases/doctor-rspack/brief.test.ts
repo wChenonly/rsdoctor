@@ -1,4 +1,4 @@
-import { expect, test, webkit } from '@playwright/test';
+import { expect, test, chromium } from '@playwright/test';
 import { getSDK, setSDK } from '@rsdoctor/core/plugins';
 import { compileByRspack } from '@scripts/test-helper';
 import { Compiler } from '@rspack/core';
@@ -25,7 +25,7 @@ async function rspackCompile(
       extensions: ['.ts', '.js'],
     },
     output: {
-      path: path.join(__dirname, '../doctor-rspack/dist'),
+      path: path.join(__dirname, '../doctor-rspack/dist/brief'),
     },
     module: {
       rules: [
@@ -106,12 +106,12 @@ test('rspack brief mode', async () => {
 
   const reportPath = path.join(
     __dirname,
-    './dist/.rsdoctor/rsdoctor-report.html',
+    './dist/brief/.rsdoctor/rsdoctor-report.html',
   );
 
   fileExists(reportPath);
 
-  const browser = await webkit.launch();
+  const browser = await chromium.launch();
 
   // Create a new browser context
   const context = await browser.newContext();

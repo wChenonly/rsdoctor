@@ -3,9 +3,9 @@ import type {
   Common,
   Plugin,
   SDK,
+  Linter,
 } from '@rsdoctor/types';
-import type { RsdoctorSlaveSDK, RsdoctorWebpackSDK } from '@rsdoctor/sdk';
-import { ChunkGraph, ModuleGraph } from '@rsdoctor/graph';
+import type { RsdoctorPrimarySDK, RsdoctorSDK } from '@rsdoctor/sdk';
 import { rules } from '@/rules/rules';
 
 type InternalRules = Common.UnionToTuple<(typeof rules)[number]>;
@@ -41,7 +41,7 @@ export interface RsdoctorWebpackPluginOptions<
   mode?: keyof typeof SDK.IMode;
 
   /**
-   * configuration of the interceptor for webpack loaders.
+   * configuration of the interceptor for webpack loaders. TODO: delete this options.
    * @description worked when the `features.loader === true`.
    */
   loaderInterceptorOptions?: {
@@ -55,25 +55,16 @@ export interface RsdoctorWebpackPluginOptions<
    * @default false
    */
   disableClientServer?: boolean;
+
   /**
-   * sdk instance of outside
+   * sdk instance of outside. TODO: delete this options
    */
-  sdkInstance?: RsdoctorWebpackSDK;
+  sdkInstance?: RsdoctorSDK;
 
   /**
    * Whether to turn on some characteristic analysis capabilities, such as: the support for the BannerPlugin.
    */
   supports?: ISupport;
-
-  /**
-   * The directory where the report files will be output.
-   */
-  reportDir?: string;
-
-  /**
-   * Control the Rsdoctor reporter codes records.
-   */
-  reportCodeType?: IReportCodeType | undefined;
 
   /**
    * The port of the Rsdoctor server.
@@ -91,22 +82,40 @@ export interface RsdoctorWebpackPluginOptions<
   brief?: SDK.BriefConfig;
 
   /**
-   * control the Rsdoctor upload data to TOS, used by inner-rsdoctor.
+   * control the Rsdoctor upload data to TOS, used by inner-rsdoctor. TODO: delete this options
    * @default false
    */
   disableTOSUpload?: boolean;
 
   /**
-   * The name of inner rsdoctor's client package, used by inner-rsdoctor.
+   * The name of inner rsdoctor's client package, used by inner-rsdoctor. TODO: delete this options
    * @default false
    */
   innerClientPath?: string;
+
+  output?: {
+    /**
+     * The directory where the report files will be output.
+     */
+    reportDir?: string;
+
+    /**
+     * Control the Rsdoctor reporter codes records.
+     */
+    reportCodeType?: IReportCodeType | undefined;
+
+    /**
+     * Configure whether to compress data.
+     * @default false
+     */
+    compressData?: boolean;
+  };
 }
 
 export interface RsdoctorMultiplePluginOptions<
   Rules extends LinterType.ExtendRuleData[] = LinterType.ExtendRuleData[],
 > extends Omit<RsdoctorWebpackPluginOptions<Rules>, 'sdkInstance'>,
-    Pick<ConstructorParameters<typeof RsdoctorSlaveSDK>[0], 'stage'> {
+    Pick<ConstructorParameters<typeof RsdoctorPrimarySDK>[0], 'stage'> {
   /**
    * name of builder
    */
@@ -124,19 +133,18 @@ export interface RsdoctorPluginOptionsNormalized<
 > extends Common.DeepRequired<
     Omit<
       RsdoctorWebpackPluginOptions<Rules>,
-      | 'sdkInstance'
-      | 'linter'
-      | 'reportCodeType'
-      | 'supports'
-      | 'port'
-      | 'brief'
+      'sdkInstance' | 'linter' | 'output' | 'supports' | 'port' | 'brief'
     >
   > {
   features: Common.DeepRequired<Plugin.RsdoctorWebpackPluginFeatures>;
   linter: Required<LinterType.Options<Rules, InternalRules>>;
-  sdkInstance?: RsdoctorWebpackSDK;
+  sdkInstance?: RsdoctorSDK;
+  output: {
+    reportCodeType: SDK.ToDataType;
+    reportDir: string;
+    compressData: boolean;
+  };
   port?: number;
-  reportCodeType: SDK.ToDataType;
   supports: ISupport;
   brief: SDK.BriefConfig;
 }
@@ -160,11 +168,11 @@ export interface RsdoctorPluginInstance<
 > extends BasePluginInstance<T> {
   readonly name: string;
   readonly options: RsdoctorPluginOptionsNormalized<Rules>;
-  readonly sdk: RsdoctorWebpackSDK;
+  readonly sdk: RsdoctorSDK;
   readonly isRsdoctorPlugin: boolean;
   _modulesGraphApplied?: boolean;
-  chunkGraph?: ChunkGraph;
-  modulesGraph: ModuleGraph;
+  chunkGraph?: SDK.ChunkGraphInstance;
+  modulesGraph: SDK.ModuleGraphInstance;
   ensureModulesChunksGraphApplied(compiler: T): void;
 }
 
@@ -172,6 +180,29 @@ export interface RsdoctorRspackPluginInstance<
   Rules extends LinterType.ExtendRuleData[] = [],
 > extends RsdoctorPluginInstance<Plugin.BaseCompilerType<'rspack'>, Rules> {}
 
+export interface RsdoctorRspackPluginExperiments {
+  /**
+   * Whether to enable the native plugin to improve the performance.
+   * @default false
+   */
+  enableNativePlugin?: boolean;
+}
+
+export interface RsdoctorRspackPluginExperimentsNormalized {
+  enableNativePlugin?: boolean;
+}
+
 export interface RsdoctorRspackPluginOptions<
   Rules extends LinterType.ExtendRuleData[],
-> extends RsdoctorWebpackPluginOptions<Rules> {}
+> extends RsdoctorWebpackPluginOptions<Rules> {
+  /**
+   * The experiments of the Rsdoctor Rspack plugin.
+   */
+  experiments?: RsdoctorRspackPluginExperiments;
+}
+
+export type RsdoctorRspackPluginOptionsNormalized<
+  Rules extends Linter.ExtendRuleData[],
+> = RsdoctorPluginOptionsNormalized<Rules> & {
+  experiments?: RsdoctorRspackPluginExperimentsNormalized;
+};

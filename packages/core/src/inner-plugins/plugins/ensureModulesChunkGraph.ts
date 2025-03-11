@@ -1,16 +1,19 @@
 import path from 'path';
-import { RsdoctorPluginInstance } from '@/types';
-import { ModuleGraph } from '@rsdoctor/graph';
-import { Linter, Plugin, Constants, Manifest } from '@rsdoctor/types';
+import {
+  RsdoctorPluginInstance,
+  RsdoctorRspackPluginOptionsNormalized,
+} from '@/types';
+import { Linter, Plugin, Constants, Manifest, SDK } from '@rsdoctor/types';
 import { Process } from '@rsdoctor/utils/build';
-import { debug } from '@rsdoctor/utils/logger';
+import { chalk, debug, logger } from '@rsdoctor/utils/logger';
 import fse from 'fs-extra';
 import {
   Chunks as ChunksBuildUtils,
   ModuleGraph as ModuleGraphBuildUtils,
-} from '../../build-utils/build';
-import { Chunks as ChunksUtils } from '../../build-utils/common';
+} from '@/build-utils/build';
+import { Chunks as ChunksUtils } from '@/build-utils/common';
 import { internalPluginTapPreOptions } from '../constants';
+import { applyRspackNativePlugin } from './rspack';
 
 /**
  * @description Generate ModuleGraph and ChunkGraph from stats and webpack module apis;
@@ -33,30 +36,65 @@ export const ensureModulesChunksGraphFn = (
     },
   };
 
+  const RsdoctorRspackPlugin = (
+    compiler.webpack.experiments as Plugin.RspackExportsExperiments
+  )?.RsdoctorPlugin;
+  const enableRspackNativePlugin = (
+    _this.options as RsdoctorRspackPluginOptionsNormalized<
+      Linter.ExtendRuleData[]
+    >
+  ).experiments?.enableNativePlugin;
+  if (enableRspackNativePlugin && RsdoctorRspackPlugin) {
+    applyRspackNativePlugin(compiler, _this, RsdoctorRspackPlugin);
+  }
+
   compiler.hooks.done.tapPromise(
     internalPluginTapPreOptions('moduleGraph'),
     async (_stats: any) => {
       const stats = _stats as Plugin.Stats;
-      const statsJson = stats.toJson();
-
+      const getStatsJson = (() => {
+        let cached: Plugin.StatsCompilation | null = null;
+        return () => {
+          if (cached) return cached as Plugin.StatsCompilation;
+          // TODO: need optimize this stats.toJSON 's stats options.
+          cached = stats.toJson();
+          return cached;
+        };
+      })();
       debug(Process.getMemoryUsageMessage, '[Before Generate ModuleGraph]');
 
-      _this.chunkGraph = ChunksBuildUtils.chunkTransform(new Map(), statsJson);
+      if (!_this.chunkGraph?.getChunks().length) {
+        _this.chunkGraph = ChunksBuildUtils.chunkTransform(
+          new Map(),
+          getStatsJson(),
+        );
+      }
 
-      /** generate module graph */
-      _this.modulesGraph = await ModuleGraphBuildUtils.getModuleGraphByStats(
-        stats.compilation,
-        statsJson,
-        process.cwd(),
-        _this.chunkGraph,
-        _this.options.features,
-        context,
-      );
+      if (!_this.modulesGraph.getModules().length) {
+        /** generate module graph */
+        _this.modulesGraph = await ModuleGraphBuildUtils.getModuleGraphByStats(
+          stats.compilation,
+          getStatsJson(),
+          process.cwd(),
+          _this.chunkGraph!,
+          _this.options.features,
+          context,
+        );
+      }
 
       debug(Process.getMemoryUsageMessage, '[After Generate ModuleGraph]');
 
       /** Tree Shaking */
       if (_this.options.features.treeShaking) {
+        if ('rspackVersion' in compiler.webpack) {
+          logger.info(
+            chalk.yellow(
+              'Rspack currently does not support treeShaking capabilities.',
+            ),
+          );
+          return;
+        }
+
         _this.modulesGraph =
           ModuleGraphBuildUtils.appendTreeShaking(
             _this.modulesGraph,
@@ -74,10 +112,10 @@ export const ensureModulesChunksGraphFn = (
 
       /** transform modules graph */
       const shouldParseBundle = _this.options.supports.parseBundle !== false;
-      await getModulesInfosByStats(
+      await getModulesInfos(
         compiler,
-        statsJson,
         _this.modulesGraph,
+        _this.chunkGraph!,
         shouldParseBundle,
       );
 
@@ -85,18 +123,19 @@ export const ensureModulesChunksGraphFn = (
 
       _this.modulesGraph &&
         (await _this.sdk.reportModuleGraph(_this.modulesGraph));
-      await _this.sdk.reportChunkGraph(_this.chunkGraph);
+      await _this.sdk.reportChunkGraph(_this.chunkGraph!);
 
       if (_this.options.supports.generateTileGraph) {
         /** Generate webpack-bundle-analyzer tile graph */
         const reportFilePath = await ChunksBuildUtils.generateTileGraph(
-          statsJson as Plugin.BaseStats,
+          getStatsJson() as Plugin.BaseStats,
           {
             reportFilename: path.join(
               Constants.RsdoctorOutputFolder,
               ChunksBuildUtils.TileGraphReportName,
             ),
             reportTitle: 'bundle-analyzer',
+            reportDir: _this.options.output.reportDir,
           },
           compiler.outputPath,
         );
@@ -119,10 +158,10 @@ export const ensureModulesChunksGraphFn = (
  * @return {*}
  * @memberof RsdoctorWebpackPlugin
  */
-async function getModulesInfosByStats(
+async function getModulesInfos(
   compiler: Plugin.BaseCompiler,
-  stats: Plugin.StatsCompilation,
-  moduleGraph: ModuleGraph,
+  moduleGraph: SDK.ModuleGraphInstance,
+  chunkGraph: SDK.ChunkGraphInstance,
   parseBundle: boolean,
 ) {
   if (!moduleGraph) {
@@ -131,7 +170,8 @@ async function getModulesInfosByStats(
   try {
     const parsedModulesData =
       (await ChunksBuildUtils.getAssetsModulesData(
-        stats,
+        moduleGraph,
+        chunkGraph,
         compiler.outputPath,
         parseBundle,
       )) || {};

@@ -1,6 +1,7 @@
 {
   "name": "@examples/doctor-rsbuild-minimal",
   "version": "0.0.1",
+  "private": true,
   "description": "",
   "files": [
     "dist",
@@ -21,8 +22,8 @@
     "semver7": "npm:semver@7.5.4"
   },
   "devDependencies": {
-    "@rsbuild/core": "0.7.5",
-    "@rsbuild/plugin-react": "0.7.5",
+    "@rsbuild/core": "^1.2.2",
+    "@rsbuild/plugin-react": "^1.1.0",
     "@rsdoctor/core": "workspace:*",
     "@rsdoctor/rspack-plugin": "workspace:*",
     "@types/react": "^18",

@@ -18,6 +18,14 @@ export function getTooltipHtmlForLoader(
       <span>isPitch</span>
       <span>${loader.isPitch}</span>
     </li>
+    ${
+      loader.layer && loader.layer !== 'undefined'
+        ? `<li class="loader-tooltip-item">
+        <span>layer</span>
+        <span>${loader.layer}</span>
+      </li>`
+        : ``
+    }
     <li class="loader-tooltip-item">
       <span>duration</span>
       <span class="loader-tooltip-text-bold">${formatCosts(loader.costs)}</span>
