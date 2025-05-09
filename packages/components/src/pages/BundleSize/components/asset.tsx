@@ -20,8 +20,9 @@ import {
   Typography,
 } from 'antd';
 import { DataNode as AntdDataNode } from 'antd/es/tree';
-import { omitBy, sumBy } from 'lodash-es';
-import { dirname, relative } from 'path';
+import { sumBy } from 'es-toolkit/math';
+import { omitBy } from 'es-toolkit/object';
+import { dirname, relative } from 'node:path';
 import React, { useEffect, useMemo, useState } from 'react';
 import { CodeViewer } from 'src/components/base';
 import { Badge as Bdg } from '../../../components/Badge';

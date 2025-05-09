@@ -27,11 +27,9 @@ import {
   Plugin,
   SDK,
 } from '@rsdoctor/types';
-import path from 'path';
+import path from 'node:path';
 import { pluginTapName, pluginTapPostOptions } from './constants';
-import { cloneDeep } from 'lodash';
-
-import { Loader } from '@rsdoctor/utils/common';
+import { Loader, Lodash } from '@rsdoctor/utils/common';
 import { chalk, logger } from '@rsdoctor/utils/logger';
 import { ModuleGraph } from '@rsdoctor/graph';
 
@@ -244,7 +242,7 @@ export class RsdoctorRspackPlugin<Rules extends Linter.ExtendRuleData[]>
   public getRspackConfig(compiler: Plugin.BaseCompilerType<'rspack'>) {
     if (compiler.isChild()) return;
     const { plugins, infrastructureLogging, ...rest } = compiler.options;
-    const _rest = cloneDeep(rest);
+    const _rest = Lodash.cloneDeep(rest);
 
     makeRulesSerializable(_rest.module.defaultRules as RuleSetRule[]);
     makeRulesSerializable(_rest.module.rules as RuleSetRule[]);

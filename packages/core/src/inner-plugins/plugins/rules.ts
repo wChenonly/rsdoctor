@@ -1,7 +1,7 @@
 import { InternalBasePlugin } from '../plugins';
 import { Linter } from '../../rules';
 import { DevToolError } from '@rsdoctor/utils/error';
-import { pull } from 'lodash';
+import { pull } from 'es-toolkit/array';
 import { Plugin } from '@rsdoctor/types';
 import { WebpackError } from 'webpack';
 
@@ -39,13 +39,13 @@ export class InternalRulesPlugin extends InternalBasePlugin<Plugin.BaseCompiler>
         Array.isArray(compilation.errors) &&
         compilation.errors.includes(item)
       ) {
-        pull(compilation.errors, item);
+        pull(compilation.errors as any, item);
       }
       if (
         Array.isArray(compilation.warnings) &&
         compilation.warnings.includes(item)
       ) {
-        pull(compilation.warnings, item);
+        pull(compilation.warnings as any, item);
       }
     });
 

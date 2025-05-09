@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { groupBy } from 'lodash-es';
+import { groupBy } from 'es-toolkit/array';
 import { Empty } from 'antd';
 import './loader.scss';
 import { useTheme } from 'src/utils/manifest';

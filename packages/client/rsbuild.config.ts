@@ -119,7 +119,7 @@ export default defineConfig(({ env }) => {
             vender: {
               chunks: 'all',
               name: 'vender',
-              test: /node_modules\/(acorn|lodash|i18next|socket.io-*|axios|remark-*)/,
+              test: /node_modules\/(acorn|es-toolkit|i18next|socket.io-*|axios|remark-*)/,
               maxSize: 1000000,
               minSize: 200000,
             },

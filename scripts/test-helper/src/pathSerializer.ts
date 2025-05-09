@@ -1,5 +1,5 @@
-import os from 'os';
-import _ from 'lodash';
+import os from 'node:os';
+import { snakeCase } from 'es-toolkit/string';
 import {
   splitPathString,
   compilePathMatcherRegExp,
@@ -35,7 +35,7 @@ export function applyPathMatcher(
       typeof matcher.mark === 'string'
         ? matcher.mark
         : matcher.mark(substring, ...args);
-    return `<${_.snakeCase(ret).toUpperCase()}>`;
+    return `<${snakeCase(ret).toUpperCase()}>`;
   };
   return str.replace(regex, replacer);
 }

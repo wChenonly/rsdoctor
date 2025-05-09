@@ -1,5 +1,4 @@
-import path from 'path';
-
+import path from 'node:path';
 import { logger } from '@rsdoctor/utils/logger';
 import { SDK } from '@rsdoctor/types';
 import { ParseBundle } from '@/types';

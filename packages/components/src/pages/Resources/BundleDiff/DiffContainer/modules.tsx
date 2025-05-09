@@ -10,7 +10,6 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import { includes, uniq, values } from 'lodash-es';
 import { InfoCircleOutlined, FileSearchOutlined } from '@ant-design/icons';
 import {
   BundleDiffComponentCardProps,
@@ -23,7 +22,7 @@ import { ViewChanges } from './changes';
 import { UpdateType } from './constants';
 import { Badge as Bdg } from '../../../../components/Badge';
 import { ModuleHashPattern, getTargetColumnPropsForModuleRow } from './row';
-import { Graph } from '@rsdoctor/utils/common';
+import { Graph, Lodash } from '@rsdoctor/utils/common';
 
 export function getUpdateType(e: BundleDiffTableModulesData): UpdateType {
   if (e.baseline && !e.current) {
@@ -138,7 +137,7 @@ export const Modules: React.FC<BundleDiffComponentCardProps> = ({
       res[modPath].current = mod;
     });
 
-    return values(res);
+    return Object.values(res);
   }, [bModules, cModules]);
 
   const filteredDataSource = useMemo(() => {
@@ -150,7 +149,7 @@ export const Modules: React.FC<BundleDiffComponentCardProps> = ({
 
     if (selectedUpdateTypes.length) {
       list = list.filter((e) => {
-        return includes(selectedUpdateTypes, getUpdateType(e));
+        return selectedUpdateTypes.includes(getUpdateType(e));
       });
     }
 
@@ -183,7 +182,10 @@ export const Modules: React.FC<BundleDiffComponentCardProps> = ({
             mode="multiple"
             placeholder="Filter by changed type"
             style={{ width: 200 }}
-            options={values(UpdateType).map((e) => ({ label: e, value: e }))}
+            options={Object.values(UpdateType).map((e) => ({
+              label: e,
+              value: e,
+            }))}
             allowClear
             onChange={(e) => {
               setSelectedUpdateTypes(e);
@@ -282,12 +284,12 @@ export const Modules: React.FC<BundleDiffComponentCardProps> = ({
 
                 return (
                   <Space direction="vertical">
-                    {uniq(c)
+                    {Lodash.uniq(c)
                       .filter(Boolean)
                       .map((e) => (
                         <Bdg label="Current" value={e} key={`c_${e}`} />
                       ))}
-                    {uniq(b)
+                    {Lodash.uniq(b)
                       .filter(Boolean)
                       .map((e) => (
                         <Bdg label="Baseline" value={e} key={`b_${e}`} />

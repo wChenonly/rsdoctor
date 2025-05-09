@@ -1,4 +1,3 @@
-import { unionBy } from 'lodash';
 import { Statement } from '@rsdoctor/graph';
 import {
   Compilation,
@@ -10,6 +9,7 @@ import {
 } from 'webpack';
 import type { EntryPoint, ExportInfo } from '@/types/index';
 import { SDK } from '@rsdoctor/types';
+import { Lodash } from '@rsdoctor/utils/common';
 
 export function isNormalModule(mod: Module): mod is NormalModule {
   return 'request' in mod && 'rawRequest' in mod && 'resource' in mod;
@@ -174,7 +174,7 @@ export function getAllModules(compilation: Compilation) {
     modules.push(mod as NormalModule);
   }
 
-  return unionBy(
+  return Lodash.unionBy(
     modules.filter(
       (mod) => !getWebpackModuleId(mod).startsWith('webpack/runtime'),
     ),
