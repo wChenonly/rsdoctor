@@ -2,8 +2,7 @@ import { Linter, Rule } from '@rsdoctor/types';
 import { Config } from './types';
 import { defineRule } from '../../rule';
 import { getErrorMsgForDupPckChunks } from './utils';
-import { uniq } from 'lodash';
-
+import { Lodash } from '@rsdoctor/utils/common';
 export type { Config } from './types';
 
 const title = 'cross-chunks-package';
@@ -41,7 +40,10 @@ export const rule = defineRule<typeof title, Config>(() => {
         pkg.duplicates.forEach((dup) =>
           chunks.push(...dup.chunks.map((ck) => ck.name)),
         );
-        const message = getErrorMsgForDupPckChunks(uniq(chunks), pkg.name);
+        const message = getErrorMsgForDupPckChunks(
+          Lodash.uniq(chunks),
+          pkg.name,
+        );
 
         report({
           message,

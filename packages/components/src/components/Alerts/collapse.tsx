@@ -1,8 +1,7 @@
 import { ReactNode } from 'react';
 import { Collapse, Typography, Divider, Space, Tabs, Tag, Tooltip } from 'antd';
 import Icon from '@ant-design/icons';
-import { sumBy } from 'lodash-es';
-
+import { sumBy } from 'es-toolkit/math';
 import Overview from '../Overall/overview';
 import { TextDrawer } from '../TextDrawer';
 import { Title } from '../Title';

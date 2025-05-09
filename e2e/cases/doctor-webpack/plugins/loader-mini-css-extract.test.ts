@@ -1,11 +1,11 @@
 import { Common } from '@rsdoctor/types';
 import { compileByWebpack5 } from '@scripts/test-helper';
-import { cloneDeep } from 'lodash';
-import path from 'path';
+import path from 'node:path';
 import { test, expect } from '@playwright/test';
 import type { NormalModule, WebpackPluginInstance } from 'webpack';
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 import { createRsdoctorPlugin } from '../test-utils';
+import { Lodash } from '@rsdoctor/utils/common';
 
 const testLoaderPath = path.resolve(
   __dirname,
@@ -32,7 +32,7 @@ async function webpack(
       const mapper = (module: NormalModule) =>
         module.loaders.map((e) => ({
           loader: e.loader,
-          options: cloneDeep(e.options),
+          options: Lodash.cloneDeep(e.options),
         }));
       const hookHandler = (
         context: Common.PlainObject,
@@ -143,7 +143,7 @@ function createTests(title: string, compile: typeof compileByWebpack5) {
     const { loaderData, beforeTransformRes, afterTransformRes } = await webpack(
       compile,
       (module) => {
-        const originLoaders = cloneDeep(module.loaders);
+        const originLoaders = Lodash.cloneDeep(module.loaders);
 
         originLoaders[0].options.mode = 'async';
 

@@ -55,10 +55,6 @@ importers:
         version: 3.0.9(@types/debug@4.1.12)(@types/node@22.14.1)(less@4.2.1)(sass-embedded@1.87.0)(terser@5.37.0)
 
   e2e:
-    dependencies:
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
     devDependencies:
       '@playwright/test':
         specifier: 1.44.1
@@ -87,9 +83,6 @@ importers:
       '@rspack/core':
         specifier: 1.3.8
         version: 1.3.8(@swc/helpers@0.5.17)
-      '@types/lodash':
-        specifier: ^4.17.16
-        version: 4.17.16
       '@types/node':
         specifier: ^22.8.1
         version: 22.14.1
@@ -608,9 +601,6 @@ importers:
       '@rsdoctor/graph':
         specifier: workspace:*
         version: link:../graph
-      '@rsdoctor/types':
-        specifier: workspace:*
-        version: link:../types
       '@rsdoctor/utils':
         specifier: workspace:*
         version: link:../utils
@@ -635,12 +625,12 @@ importers:
       echarts-for-react:
         specifier: ^3.0.3
         version: 3.0.3(echarts@5.6.0)(react@18.3.1)
+      es-toolkit:
+        specifier: ^1.35.0
+        version: 1.37.2
       i18next:
         specifier: 22.0.4
         version: 22.0.4
-      lodash-es:
-        specifier: 4.17.21
-        version: 4.17.21
       monaco-editor:
         specifier: 0.49.0
         version: 0.49.0
@@ -681,9 +671,9 @@ importers:
       '@rsbuild/plugin-check-syntax':
         specifier: 1.3.0
         version: 1.3.0(@rsbuild/core@1.3.15)
-      '@types/lodash-es':
-        specifier: 4.17.12
-        version: 4.17.12
+      '@rsdoctor/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/node':
         specifier: ^22.8.1
         version: 22.14.1
@@ -732,6 +722,9 @@ importers:
       enhanced-resolve:
         specifier: 5.12.0
         version: 5.12.0
+      es-toolkit:
+        specifier: ^1.35.0
+        version: 1.37.2
       filesize:
         specifier: ^10.1.6
         version: 10.1.6
@@ -860,9 +853,9 @@ importers:
       '@rsdoctor/utils':
         specifier: workspace:*
         version: link:../utils
-      lodash.unionby:
-        specifier: ^4.8.0
-        version: 4.8.0
+      es-toolkit:
+        specifier: ^1.35.0
+        version: 1.37.2
       socket.io:
         specifier: 4.8.1
         version: 4.8.1
@@ -876,9 +869,6 @@ importers:
       '@types/estree':
         specifier: 1.0.5
         version: 1.0.5
-      '@types/lodash.unionby':
-        specifier: ^4.8.9
-        version: 4.8.9
       '@types/node':
         specifier: ^22.8.1
         version: 22.14.1
@@ -913,16 +903,13 @@ importers:
       '@rsdoctor/utils':
         specifier: workspace:*
         version: link:../utils
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+      es-toolkit:
+        specifier: ^1.35.0
+        version: 1.37.2
     devDependencies:
       '@rspack/core':
         specifier: 1.3.8
         version: 1.3.8(@swc/helpers@0.5.17)
-      '@types/lodash':
-        specifier: ^4.17.16
-        version: 4.17.16
       '@types/node':
         specifier: ^22.8.1
         version: 22.14.1
@@ -1066,6 +1053,9 @@ importers:
       deep-eql:
         specifier: 4.1.4
         version: 4.1.4
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
       envinfo:
         specifier: 7.14.0
         version: 7.14.0
@@ -1136,19 +1126,16 @@ importers:
       '@rsdoctor/utils':
         specifier: workspace:*
         version: link:../utils
+      es-toolkit:
+        specifier: ^1.35.0
+        version: 1.37.2
       fs-extra:
         specifier: ^11.1.1
         version: 11.2.0
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
     devDependencies:
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
-      '@types/lodash':
-        specifier: ^4.17.16
-        version: 4.17.16
       '@types/node':
         specifier: ^22.8.1
         version: 22.14.1
@@ -1173,15 +1160,12 @@ importers:
       '@rspack/core':
         specifier: 1.3.8
         version: 1.3.8(@swc/helpers@0.5.17)
-      '@types/lodash':
-        specifier: ^4.17.16
-        version: 4.17.16
       '@types/node':
         specifier: ^22.8.1
         version: 22.14.1
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+      es-toolkit:
+        specifier: ^1.35.0
+        version: 1.37.2
       memfs:
         specifier: 4.17.1
         version: 4.17.1
@@ -4237,12 +4221,6 @@ packages:
   '@types/loadable__component@5.13.9':
     resolution: {integrity: sha512-QWOtIkwZqHNdQj3nixQ8oyihQiTMKZLk/DNuvNxMSbTfxf47w+kqcbnxlUeBgAxdOtW0Dh48dTAIp83iJKtnrQ==}
 
-  '@types/lodash-es@4.17.12':
-    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
-
-  '@types/lodash.unionby@4.8.9':
-    resolution: {integrity: sha512-mhu+q4xOl7nwf1EJi0jknjrOMBbKip54kW6rlvu7/gna5zqOIdwJjBfiMa26n6oPb5Bjbcz08tC2oz62p6EqyQ==}
-
   '@types/lodash@4.17.16':
     resolution: {integrity: sha512-HX7Em5NYQAXKW+1T+FiuG27NGwzJfCX3s1GjOa7ujxZa52kjJLOr4FUxT+giF6Tgxv1e+/czV/iTtBw27WTU9g==}
 
@@ -5843,6 +5821,9 @@ packages:
     resolution: {integrity: sha512-j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==}
     engines: {node: '>= 0.4'}
 
+  es-toolkit@1.37.2:
+    resolution: {integrity: sha512-ADDfk+pPFF0ofMpRAIc6on01p8heiuwuuJsYLzTP4UOjxVK9QsE2+0D1Q4J/zX2XBo6ac+27H5++YBIwmGAX/g==}
+
   esast-util-from-estree@2.0.0:
     resolution: {integrity: sha512-4CyanoAudUSBAn5K13H4JhsMH6L9ZP7XbLVe/dKybkxMO7eDyLsT8UHl9TRNrU2Gr9nz+FovfSIjuXWJ81uVwQ==}
 
@@ -7204,9 +7185,6 @@ packages:
 
   lodash.startcase@4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
-
-  lodash.unionby@4.8.0:
-    resolution: {integrity: sha512-e60kn4GJIunNkw6v9MxRnUuLYI/Tyuanch7ozoCtk/1irJTYBj+qNTxr5B3qVflmJhwStJBv387Cb+9VOfABMg==}
 
   lodash.uniq@4.5.0:
     resolution: {integrity: sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ==}
@@ -14572,14 +14550,6 @@ snapshots:
     dependencies:
       '@types/react': 18.3.21
 
-  '@types/lodash-es@4.17.12':
-    dependencies:
-      '@types/lodash': 4.17.16
-
-  '@types/lodash.unionby@4.8.9':
-    dependencies:
-      '@types/lodash': 4.17.16
-
   '@types/lodash@4.17.16': {}
 
   '@types/mdast@3.0.15':
@@ -16496,6 +16466,8 @@ snapshots:
       has-tostringtag: 1.0.2
       hasown: 2.0.2
 
+  es-toolkit@1.37.2: {}
+
   esast-util-from-estree@2.0.0:
     dependencies:
       '@types/estree-jsx': 1.0.5
@@ -18050,8 +18022,6 @@ snapshots:
   lodash.once@4.1.1: {}
 
   lodash.startcase@4.4.0: {}
-
-  lodash.unionby@4.8.0: {}
 
   lodash.uniq@4.5.0: {}
 

@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import { sumBy, uniq, values } from 'lodash-es';
+import { sumBy } from 'es-toolkit/math';
 import { SDK } from '@rsdoctor/types';
 import { BundleDiffTablePackagesData } from './types';
 import { formatSize } from '../../../../utils';
@@ -19,6 +19,7 @@ import { FileUpdateTypeTag } from './modules';
 import { UpdateType } from './constants';
 import { Badge as Bdg } from '../../../../components/Badge';
 import { SizePercent } from '../../../../components/Card/diff';
+import { Lodash } from '@rsdoctor/utils/common';
 
 const getChangedType = (data: BundleDiffTablePackagesData): UpdateType => {
   if (data.baseline && data.current) {
@@ -117,7 +118,7 @@ export const getPackagesTableDataSource = ({
   const pre: BundleDiffTablePackagesData[] = [];
   const post: BundleDiffTablePackagesData[] = [];
 
-  values(res).forEach((a) => {
+  Object.values(res).forEach((a) => {
     if (isChanged(a)) {
       pre.push(a);
     } else {
@@ -145,7 +146,7 @@ export const Packages: React.FC<{
   }
 
   const pkgNames = useMemo(() => {
-    return uniq(bPkgs.concat(cPkgs).map((e) => e.name));
+    return Lodash.uniq(bPkgs.concat(cPkgs).map((e) => e.name));
   }, [bPkgs, cPkgs]);
 
   const [selectedPkgNames, setSelectedPkgNames] = useState<string[]>([]);
@@ -208,7 +209,10 @@ export const Packages: React.FC<{
             mode="multiple"
             placeholder="Filter by changed type"
             style={{ width: 200 }}
-            options={values(UpdateType).map((e) => ({ label: e, value: e }))}
+            options={Object.values(UpdateType).map((e) => ({
+              label: e,
+              value: e,
+            }))}
             allowClear
             onChange={(e) => {
               setSelectedUpdateTypes(e);
@@ -299,12 +303,12 @@ export const Packages: React.FC<{
                   title: 'Parsed Size',
                   render: (_v, r) => {
                     const parsedSize = sumBy(
-                      r.current,
+                      r.current!,
                       (e) => e.size.parsedSize,
                     );
                     const DiffComponent = () => (
                       <SizePercent
-                        baseline={sumBy(r.baseline, (e) => e.size.parsedSize)}
+                        baseline={sumBy(r.baseline!, (e) => e.size.parsedSize)}
                         current={parsedSize}
                       />
                     );

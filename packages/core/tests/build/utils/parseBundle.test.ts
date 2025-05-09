@@ -1,9 +1,8 @@
 import { lowerCase } from 'lodash';
-import fs from 'fs';
-import os from 'os';
+import fs from 'node:fs';
+import os from 'node:os';
 import { describe, it, expect } from 'vitest';
 import { parseBundle } from '@/build-utils/build/utils/parseBundle';
-import { SDK } from '@rsdoctor/types';
 
 const BUNDLES_DIR = `${__dirname}/bundles`;
 

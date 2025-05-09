@@ -21,14 +21,13 @@ import { openBrowser, RsdoctorSDK } from '@rsdoctor/sdk';
 import { Constants, Linter, Manifest, SDK } from '@rsdoctor/types';
 import { Process } from '@rsdoctor/utils/build';
 import { chalk, debug } from '@rsdoctor/utils/logger';
-import { cloneDeep } from 'lodash';
-import path from 'path';
+import path from 'node:path';
 import type { Compiler, Configuration, RuleSetRule } from 'webpack';
 import { pluginTapName, pluginTapPostOptions } from './constants';
 
 import { InternalResolverPlugin } from './plugins/resolver';
 import { ensureModulesChunksGraphFn } from '@rsdoctor/core/plugins';
-import { Loader } from '@rsdoctor/utils/common';
+import { Loader, Lodash } from '@rsdoctor/utils/common';
 import { Loader as BuildUtilLoader } from '@rsdoctor/core/build-utils';
 
 export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
@@ -141,7 +140,7 @@ export class RsdoctorWebpackPlugin<Rules extends Linter.ExtendRuleData[]>
 
     // deep clone before intercept
     const { plugins, infrastructureLogging, ...rest } = compiler.options;
-    const _rest = cloneDeep(rest);
+    const _rest = Lodash.cloneDeep(rest);
 
     makeRulesSerializable(_rest.module.defaultRules as RuleSetRule[]);
     makeRulesSerializable(_rest.module.rules as RuleSetRule[]);

@@ -1,3 +1,5 @@
+import deepmerge from 'deepmerge';
+
 // Replace lodash's isUndefined function
 export function isUndefined(value: unknown): value is undefined {
   return typeof value === 'undefined';
@@ -66,4 +68,42 @@ export function pick<T extends Record<string, any>, K extends keyof T>(
     }
   }
   return result;
+}
+
+// Replace lodash's cloneDeep function
+export const cloneDeep = <T>(value: T): T => {
+  if (value === null || value === undefined) {
+    return value;
+  }
+  return deepmerge<T>({}, value);
+};
+
+// Replace lodash's uniq function
+export function uniq<T>(arr: readonly T[]): T[] {
+  return Array.from(new Set(arr));
+}
+
+export function isFunction(
+  value: unknown,
+): value is (...args: unknown[]) => unknown {
+  return typeof value === 'function';
+}
+
+// Replace lodash's unionBy function
+export function unionBy<T>(
+  array: T[],
+  iteratee: string | ((item: T) => unknown),
+): T[] {
+  const seen = new Set();
+  return array.filter((item) => {
+    const key =
+      typeof iteratee === 'string'
+        ? (item as Record<string, unknown>)[iteratee]
+        : iteratee(item);
+    if (!seen.has(key)) {
+      seen.add(key);
+      return true;
+    }
+    return false;
+  });
 }

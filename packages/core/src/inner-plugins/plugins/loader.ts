@@ -1,7 +1,7 @@
 import { Manifest, Plugin } from '@rsdoctor/types';
 import type { HookInterceptor } from 'tapable';
-import { Loader } from '@rsdoctor/utils/common';
-import { cloneDeep, isEqual, omit } from 'lodash';
+import { Loader, Lodash } from '@rsdoctor/utils/common';
+import { isEqual } from 'es-toolkit/predicate';
 import { LoaderContext, NormalModule } from 'webpack';
 import { interceptLoader } from '../utils';
 import { InternalBasePlugin } from './base';
@@ -58,20 +58,24 @@ export class InternalLoaderPlugin<
 
         // return origin loaders not doctor internal loaders
         const originLoaders = proxyLoaders.map((loader) => {
-          const opts: ProxyLoaderOptions = loader.options || {};
+          const opts = (loader.options || {}) as ProxyLoaderOptions;
 
           if (opts[Loader.LoaderInternalPropertyName]) {
+            const {
+              [Loader.LoaderInternalPropertyName]: { loader: loaderFn },
+              ...options
+            } = opts;
             return {
               ...loader,
-              loader: opts[Loader.LoaderInternalPropertyName].loader,
-              options: omit(opts, Loader.LoaderInternalPropertyName),
+              loader: loaderFn,
+              options,
             };
           }
 
           return loader;
         });
 
-        const newLoaders = cloneDeep(originLoaders);
+        const newLoaders = Lodash.cloneDeep(originLoaders);
         if (
           typeof compiler.options.cache === 'object' &&
           'version' in compiler.options.cache &&
@@ -86,7 +90,7 @@ export class InternalLoaderPlugin<
               return Reflect.get(target, p, receiver);
             },
             set(target, p, newValue, receiver) {
-              const _newValue = cloneDeep(newValue);
+              const _newValue = Lodash.cloneDeep(newValue);
               if (p === 'loaders') {
                 if (Array.isArray(_newValue)) {
                   newLoaders.length = 0;
