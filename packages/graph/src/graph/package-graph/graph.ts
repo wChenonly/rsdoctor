@@ -1,9 +1,9 @@
-import unionBy from 'lodash.unionby';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 import { SDK } from '@rsdoctor/types';
 import { Package } from './package';
 import { PackageDependency } from './dependency';
 import { readPackageJson } from './utils';
+import { Lodash } from '@rsdoctor/utils/common';
 export { readPackageJson } from './utils';
 
 export class PackageGraph implements SDK.PackageGraphInstance {
@@ -178,10 +178,10 @@ export class PackageGraph implements SDK.PackageGraphInstance {
   }
 
   getDuplicatePackages(): SDK.PackageInstance[][] {
-    return unionBy(
+    return Lodash.unionBy(
       Array.from(this._pkgNameMap.values())
         .map((pkgs) => {
-          return unionBy(pkgs, 'version');
+          return Lodash.unionBy(pkgs, 'version');
         })
         .filter((pkgs) => pkgs.length > 1),
       (pkgs) => pkgs[0].name,

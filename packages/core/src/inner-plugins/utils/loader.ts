@@ -3,9 +3,9 @@ import {
   CachedInputFileSystem,
   create as ResolverCreator,
 } from 'enhanced-resolve';
-import fs from 'fs';
-import { omit } from 'lodash';
-import path from 'path';
+import fs from 'node:fs';
+import { omit } from 'es-toolkit/object';
+import path from 'node:path';
 import { debug } from '@rsdoctor/utils/logger';
 import { Loader } from '@rsdoctor/utils/common';
 import { Time } from '@rsdoctor/utils/common';

@@ -79,6 +79,7 @@
     "filesize": "^10.1.6",
     "fs-extra": "^11.1.1",
     "lodash": "^4.17.21",
+    "es-toolkit": "^1.35.0",
     "path-browserify": "1.0.1",
     "semver": "^7.6.3",
     "source-map": "^0.7.4",
