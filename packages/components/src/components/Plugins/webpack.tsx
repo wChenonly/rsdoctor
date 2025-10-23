@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Table, Tooltip } from 'antd';
-import { sumBy, uniq } from 'es-toolkit/compat';
+import { uniq } from 'es-toolkit/array';
+import { sumBy } from 'es-toolkit/math';
 import { SDK } from '@rsdoctor/types';
 import { formatCosts } from '../../utils';
 

@@ -1,6 +1,5 @@
 import { Manifest as ManifestShared } from '@rsdoctor/utils/common';
 import { Common, Manifest, SDK } from '@rsdoctor/types';
-import { get } from 'es-toolkit/compat';
 import { BaseDataLoader } from './base';
 import { getSocket } from '../socket';
 
@@ -25,7 +24,7 @@ export class LocalServerDataLoader extends BaseDataLoader {
 
       if (!data) return;
 
-      let res: unknown = data;
+      let res = data;
 
       // sharding files
       if (ManifestShared.isShardingData(res)) {
@@ -54,7 +53,9 @@ export class LocalServerDataLoader extends BaseDataLoader {
         return res;
       }
 
-      return rest.length > 0 ? get(res, this.joinKeys(rest)) : res;
+      return rest.length > 0
+        ? res[this.joinKeys(rest) as keyof typeof res]
+        : res;
     });
   }
 

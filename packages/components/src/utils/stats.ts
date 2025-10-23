@@ -1,12 +1,11 @@
 import { Common, Manifest, Plugin, SDK } from '@rsdoctor/types';
 import { PackageGraph } from '@rsdoctor/graph';
 import { Chunks, ModuleGraphTrans } from '@rsdoctor/graph';
-import { isArray } from 'es-toolkit/compat';
 
 export function isRspackStats(
   json: Common.PlainObject,
 ): json is Plugin.StatsCompilation {
-  return isArray(json.assets) && isArray(json.chunks);
+  return Array.isArray(json.assets) && Array.isArray(json.chunks);
 }
 
 export async function loadRspackStats(

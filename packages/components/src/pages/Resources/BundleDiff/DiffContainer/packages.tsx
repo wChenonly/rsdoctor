@@ -10,7 +10,8 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import { sumBy, uniq } from 'es-toolkit/compat';
+import { uniq } from 'es-toolkit/array';
+import { sumBy } from 'es-toolkit/math';
 import { SDK } from '@rsdoctor/types';
 import { BundleDiffTablePackagesData } from './types';
 import { formatSize } from '../../../../utils';
@@ -302,12 +303,15 @@ export const Packages: React.FC<{
                   title: 'Parsed Size',
                   render: (_v, r) => {
                     const parsedSize = sumBy(
-                      r.current,
+                      r.current || [],
                       (e) => e.size.parsedSize,
                     );
                     const DiffComponent = () => (
                       <SizePercent
-                        baseline={sumBy(r.baseline, (e) => e.size.parsedSize)}
+                        baseline={sumBy(
+                          r.baseline || [],
+                          (e) => e.size.parsedSize,
+                        )}
                         current={parsedSize}
                       />
                     );

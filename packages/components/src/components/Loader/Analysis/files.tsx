@@ -14,7 +14,6 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import { get } from 'es-toolkit/compat';
 import React, { useMemo, useState } from 'react';
 import { drawerWidth, Size } from '../../../constants';
 import {
@@ -239,7 +238,7 @@ export const LoaderFiles: React.FC<{
               files,
               filteredFiles.length >= 100 ? 3 : 4,
               (node) => {
-                const resourcePath: string = get(node, inlinedResourcePathKey)!;
+                const resourcePath: string = node[inlinedResourcePathKey];
                 const isNodeModules =
                   resourcePath.indexOf('/node_modules/') > -1;
 

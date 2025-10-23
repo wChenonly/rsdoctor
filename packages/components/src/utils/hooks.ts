@@ -1,6 +1,6 @@
 import { Algorithm } from '@rsdoctor/utils/common';
 import { Client, Manifest, Rule, SDK } from '@rsdoctor/types';
-import { uniqBy, defaults } from 'es-toolkit/compat';
+import { uniqBy } from 'es-toolkit/array';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -92,7 +92,7 @@ function ensurePlainObject<T extends object>(value: T, dfts: T): T {
     if (Array.isArray(value)) {
       return dfts;
     }
-    return defaults(value, dfts);
+    return Object.assign({}, dfts, value);
   }
 
   return dfts;

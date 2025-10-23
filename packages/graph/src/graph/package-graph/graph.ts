@@ -1,5 +1,5 @@
 import { unionBy } from 'es-toolkit/compat';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 import { SDK } from '@rsdoctor/types';
 import { Package } from './package';
 import { PackageDependency } from './dependency';

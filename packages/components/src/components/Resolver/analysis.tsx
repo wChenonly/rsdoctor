@@ -8,7 +8,6 @@ import {
 import { SDK } from '@rsdoctor/types';
 import { Resolver } from '@rsdoctor/utils/common';
 import { Button, Card, Col, Row, Space, Table, Typography } from 'antd';
-import { get } from 'es-toolkit/compat';
 import React, { useMemo, useState } from 'react';
 import { Size } from '../../constants';
 import { createFileStructures, formatCosts, mapFileKey } from '../../utils';
@@ -158,10 +157,7 @@ export const ResolverFiles: React.FC<{
               allNodeModules
                 ? undefined
                 : (node) => {
-                    const resourcePath: string = get(
-                      node,
-                      inlinedResourcePathKey,
-                    )!;
+                    const resourcePath: string = node[inlinedResourcePathKey];
                     const isNodeModules = resourcePath.indexOf(n) > -1;
 
                     if (

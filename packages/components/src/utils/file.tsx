@@ -1,4 +1,3 @@
-import { get } from 'es-toolkit/compat';
 import { Common, SDK } from '@rsdoctor/types';
 import { message, Space, TreeNodeProps, UploadFile } from 'antd';
 import { FieldDataNode } from 'rc-tree';
@@ -138,7 +137,11 @@ export function createFileStructures({
       }
 
       // uniq
-      if (parent.children!.some((e) => get(e, inlinedResourcePathKey) === file))
+      if (
+        parent.children!.some(
+          (e) => e[inlinedResourcePathKey as keyof typeof e] === file,
+        )
+      )
         return t;
 
       parent.children!.push({

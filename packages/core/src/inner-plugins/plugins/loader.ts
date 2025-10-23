@@ -1,14 +1,16 @@
 import { Manifest, Plugin } from '@rsdoctor/types';
 import type { HookInterceptor } from 'tapable';
 import { Loader } from '@rsdoctor/utils/common';
-import { cloneDeep, isEqual, omit } from 'es-toolkit/compat';
+import { cloneDeep } from 'es-toolkit/object';
+import { isEqual } from 'es-toolkit/predicate';
+import { omit } from 'es-toolkit/object';
 import { LoaderContext, NormalModule } from 'webpack';
 import { interceptLoader } from '../utils';
 import { InternalBasePlugin } from './base';
 import { ProxyLoaderOptions } from '@/types';
 import { time, timeEnd } from '@rsdoctor/utils/logger';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -96,7 +98,7 @@ export class InternalLoaderPlugin<
               return {
                 ...loader,
                 loader: opts[Loader.LoaderInternalPropertyName].loader,
-                options: omit(opts, Loader.LoaderInternalPropertyName),
+                options: omit(opts, [Loader.LoaderInternalPropertyName]),
               };
             }
 

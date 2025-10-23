@@ -1,7 +1,7 @@
 import { Module } from '@rsdoctor/graph';
 import { SDK } from '@rsdoctor/types';
 import { Space, Tag } from 'antd';
-import { escape, get } from 'es-toolkit/compat';
+import { escape } from 'es-toolkit/string';
 import type { editor, Range as RangeClass } from 'monaco-editor';
 import path from 'path-browserify';
 import { useMemo } from 'react';
@@ -60,7 +60,7 @@ export function useFileStructures(
 
 export function getTreeFilesDefaultExpandedKeys(files: any[]) {
   return mapFileKey(files, 3, (node) => {
-    const resourcePath: string = get(node, '__RESOURCEPATH__')!;
+    const resourcePath: string = node.__RESOURCEPATH__;
     const isNodeModules = resourcePath.indexOf('/node_modules/') > -1;
     return !isNodeModules;
   });

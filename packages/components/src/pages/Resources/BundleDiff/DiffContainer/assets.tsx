@@ -11,7 +11,7 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import { sumBy } from 'es-toolkit/compat';
+import { sumBy } from 'es-toolkit/math';
 import {
   CheckSquareOutlined,
   InfoCircleOutlined,

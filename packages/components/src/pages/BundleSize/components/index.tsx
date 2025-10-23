@@ -19,7 +19,8 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import { debounce, sumBy } from 'es-toolkit/compat';
+import { debounce } from 'es-toolkit/function';
+import { sumBy } from 'es-toolkit/math';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useCodeDrawer } from 'src/components/base/CodeViewer/useCodeDrawer';
 import { Badge as Bdg } from '../../../components/Badge';

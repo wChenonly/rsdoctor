@@ -1,6 +1,5 @@
 import { Manifest, SDK } from '@rsdoctor/types';
 import { Manifest as ManifestShared } from '@rsdoctor/utils/common';
-import { get } from 'es-toolkit/compat';
 import { BaseDataLoader } from './base';
 import { fetchShardingFile } from '../request';
 
@@ -42,7 +41,9 @@ export class RemoteDataLoader extends BaseDataLoader {
         res = await this.shardingDataMap.get(scope);
       }
 
-      return rest.length > 0 ? get(res, this.joinKeys(rest)) : res;
+      return rest.length > 0
+        ? res[this.joinKeys(rest) as keyof typeof res]
+        : res;
     });
   }
 

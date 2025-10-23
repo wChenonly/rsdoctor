@@ -1,5 +1,6 @@
 import { Summary } from '@rsdoctor/utils/common';
-import { minBy, sumBy } from 'es-toolkit/compat';
+import { sumBy } from 'es-toolkit/math';
+import { minBy } from 'es-toolkit/array';
 import type { Plugin } from '@rsdoctor/types';
 import { InternalBasePlugin } from './base';
 import { time, timeEnd } from '@rsdoctor/utils/logger';

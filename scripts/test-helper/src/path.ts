@@ -1,7 +1,7 @@
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
-import { escapeRegExp } from 'es-toolkit/compat';
+import { escapeRegExp } from 'es-toolkit/string';
 import upath from 'upath';
 
 export const isPathString = (test: string): boolean =>

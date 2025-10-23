@@ -1,6 +1,6 @@
 import { Common } from '@rsdoctor/types';
 import { compileByWebpack5 } from '@scripts/test-helper';
-import { cloneDeep } from 'es-toolkit/compat';
+import { cloneDeep } from 'es-toolkit/object';
 import path from 'path';
 import { test, expect } from '@playwright/test';
 import type { NormalModule, WebpackPluginInstance } from 'webpack';

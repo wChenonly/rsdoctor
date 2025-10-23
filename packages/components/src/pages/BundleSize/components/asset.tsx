@@ -19,7 +19,8 @@ import {
   Typography,
 } from 'antd';
 import { DataNode as AntdDataNode } from 'antd/es/tree';
-import { omitBy, sumBy } from 'es-toolkit/compat';
+import { omitBy } from 'es-toolkit/object';
+import { sumBy } from 'es-toolkit/math';
 import { dirname, relative } from 'path';
 import React, { useEffect, useMemo, useState } from 'react';
 import { CodeViewer } from 'src/components/base';

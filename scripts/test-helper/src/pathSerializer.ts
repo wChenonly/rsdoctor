@@ -1,5 +1,5 @@
-import os from 'os';
-import { snakeCase } from 'es-toolkit/compat';
+import os from 'node:os';
+import { snakeCase } from 'es-toolkit/string';
 import {
   splitPathString,
   compilePathMatcherRegExp,
