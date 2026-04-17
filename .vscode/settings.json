@@ -23,8 +23,5 @@
     }
   ],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.defaultFoldingRangeProvider": "rstack.rslint",
-  "[yaml]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "editor.defaultFoldingRangeProvider": "rstack.rslint"
 }
