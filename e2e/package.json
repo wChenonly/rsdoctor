@@ -21,12 +21,12 @@
     "@rsdoctor/utils": "workspace:*",
     "@rsdoctor/webpack-plugin": "workspace:*",
     "@rspack/core": "2.0.0-rc.3",
-    "@types/node": "^22.8.1",
-    "@types/react": "^18.3.28",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
     "loader-utils": "^2.0.4",
-    "es-toolkit": "^1.45.1",
+    "es-toolkit": "catalog:",
     "playwright": "1.55.1",
-    "typescript": "^5.9.2",
+    "typescript": "catalog:",
     "webpack": "^5.105.4"
   }
 }
